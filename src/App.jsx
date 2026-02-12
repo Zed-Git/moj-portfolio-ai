@@ -1,14 +1,13 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { motion } from 'framer-motion'; 
 import Header from './components/Header';
 import About from './sections/About';
 import Projects from './sections/Projects';
 import Contact from './sections/Contact';
-import ProjectDetails from './sections/ProjectDetails'; // Nova komponenta
+import ProjectDetails from './sections/ProjectDetails';
+import AdminPanel from './sections/AdminPanel'; // Dodata ekstenzija
 import bgFlare from './assets/bg-flare.jpg';
 
-// Pravimo posebnu komponentu za Home sadržaj da bi kod bio pregledniji
 const Home = () => (
   <main className="max-w-6xl mx-auto pt-60 pb-32">
     <motion.div 
@@ -44,7 +43,6 @@ function App() {
   return (
     <Router>
       <div className="relative min-h-screen w-full bg-[#03040b] text-white overflow-x-hidden font-sans">
-        {/* POZADINA */}
         <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
           <img src={bgFlare} alt="Background" className="w-full h-full object-cover scale-110" />
           <div className="absolute inset-0 bg-[#03040b]/40 bg-linear-to-b from-[#03040b]/80 via-[#03040b]/20 to-[#03040b]/90"></div>
@@ -52,12 +50,11 @@ function App() {
 
         <div className="relative z-10 px-4">
           <Header />
-          
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/project/:id" element={<ProjectDetails />} />
+<Route path="/admin" element={<AdminPanel />} />
           </Routes>
-
           <footer className="py-20 text-center opacity-30 text-[10px] tracking-[0.8em] uppercase">
             Zdravko Mijailović // 2026 // MD-AI
           </footer>

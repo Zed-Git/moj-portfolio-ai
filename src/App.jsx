@@ -1,11 +1,12 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { motion } from 'framer-motion'; 
 import Header from './components/Header';
 import About from './sections/About';
 import Projects from './sections/Projects';
 import Contact from './sections/Contact';
 import ProjectDetails from './sections/ProjectDetails';
-import AdminPanel from './sections/AdminPanel'; // Dodata ekstenzija
+import AdminPanel from './sections/AdminPanel'; // <-- MORA BITI AdminPanel
 import bgFlare from './assets/bg-flare.jpg';
 
 const Home = () => (

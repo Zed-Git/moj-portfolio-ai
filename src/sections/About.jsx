@@ -4,8 +4,13 @@ const About = () => {
   return (
     <section id="about" className="py-24">
       <div className="max-w-6xl mx-auto px-6">
-        <h2 className="text-3xl font-black text-white mb-12 uppercase tracking-widest">O meni</h2>
+
+        {/* 1. Ovde menjamo naslov */}
+        <h2 className="text-3xl font-black text-white mb-12 uppercase tracking-widest">ABOUT</h2>
+        
+                  {/* 2. 'space-y-6' je zadužen za razmake između paragrafa nadole */}
         <div className="grid md:grid-cols-2 gap-16 items-center">
+          
           <div className="space-y-6 text-blue-100/70 text-lg leading-relaxed font-light text-left">
             <p>I am a cardiologist and scientist who advocates that medicine must evolve from being merely an "individual craft or skill" (techne) into a rigorous science (logos).</p>
 <p>To achieve this transition, we must apply abstraction and advanced modeling to derive solutions that strictly follow the scientific method. </p>

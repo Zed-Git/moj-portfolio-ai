@@ -7,11 +7,11 @@ const About = () => {
         <h2 className="text-3xl font-black text-white mb-12 uppercase tracking-widest">O meni</h2>
         <div className="grid md:grid-cols-2 gap-16 items-center">
           <div className="space-y-6 text-blue-100/70 text-lg leading-relaxed font-light text-left">
-            <p>I am a cardiologist and scientist who advocates that medicine must evolve from being merely an "individual craft or skill" (techne) into a rigorous science (logos).
-To achieve this transition, we must apply abstraction and advanced modeling to derive solutions that strictly follow the scientific method. 
+            <p>I am a cardiologist and scientist who advocates that medicine must evolve from being merely an "individual craft or skill" (techne) into a rigorous science (logos).</p>
+<p>To achieve this transition, we must apply abstraction and advanced modeling to derive solutions that strictly follow the scientific method. </p>
 <p>These solutions are then validated through practical verification in real-world systems or specific experiments, ensuring full alignment with the principles of Evidence-Based Medicine.</p>
 <p>Our approach focuses on Personalized Medicine for every patient, integrating the latest scientific breakthroughs and the transformative capabilities of Artificial Intelligence.</p>
-</p>
+
             
             
           </div>

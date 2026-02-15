@@ -27,7 +27,7 @@ const Home = () => (
         </span>
       </h1>
       <p className="text-xl md:text-2xl text-white/80 max-w-2xl mx-auto mb-16 font-light leading-relaxed italic">
-        "Lekar koji koristi veštačku inteligenciju da redefiniše budućnost zdravstva."
+        "Medicine must evolve from being merely an "individual craft or skill" (techne) into a rigorous science (logos)."
       </p>
       <div className="flex flex-wrap gap-8 justify-center">
         <a href="#projects" className="bg-white text-black px-12 py-5 rounded-2xl font-black text-sm tracking-widest hover:bg-cyan-400 transition-all uppercase inline-block">Projekti</a>

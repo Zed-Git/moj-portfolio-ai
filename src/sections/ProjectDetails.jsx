@@ -1,43 +1,102 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { motion } from 'framer-motion'; 
-import { FaArrowLeft, FaMicroscope, FaCode } from 'react-icons/fa';
+import { motion } from 'framer-motion';
+import { FaArrowLeft, FaCode, FaMicroscope } from 'react-icons/fa';
+import { supabase } from '../supabaseClient';
 import bgFlare from '../assets/bg-flare.jpg';
-import { mojiProjekti } from '../data/projectsData';
 
 const ProjectDetails = () => {
-  const { id } = useParams();
-  const projekat = mojiProjekti.find(p => p.id === parseInt(id));
+  const { id } = useParams(); // Uzima ID iz URL-a (npr. /project/12)
+  const [projekat, setProjekat] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+    const fetchOneProject = async () => {
+      setLoading(true);
+      
+      // Hirurški precizan upit: Tražimo samo JEDAN projekat sa tim ID-jem
+      const { data, error } = await supabase
+        .from('projects')
+        .select('*')
+        .eq('id', id) 
+        .single(); // Kažemo bazi: "Daj mi samo jedan rezultat"
 
-  if (!projekat) return <div className="text-white text-center pt-40">Projekat nije pronađen.</div>;
+      if (error) {
+        console.error("Greška:", error.message);
+        setProjekat(null);
+      } else {
+        setProjekat(data);
+      }
+      setLoading(false);
+    };
+
+    fetchOneProject();
+    window.scrollTo(0, 0); // Vrati na vrh stranice pri otvaranju
+  }, [id]);
+
+  // Stanje dok se podaci učitavaju
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#03040b] flex items-center justify-center">
+        <p className="text-cyan-400 uppercase tracking-widest text-xs animate-pulse">Učitavanje podataka...</p>
+      </div>
+    );
+  }
+
+  // Ako projekat zaista ne postoji u bazi
+  if (!projekat) {
+    return (
+      <div className="min-h-screen bg-[#03040b] flex flex-col items-center justify-center">
+        <h2 className="text-white text-xl mb-6">Projekat nije pronađen u arhivi.</h2>
+        <Link to="/" className="text-cyan-400 uppercase text-xs font-black tracking-widest hover:text-white transition-colors">
+          Vrati se na Home
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="relative min-h-screen w-full bg-[#03040b] text-white">
+      {/* POZADINA */}
       <div className="fixed inset-0 z-0">
         <img src={bgFlare} alt="BG" className="w-full h-full object-cover opacity-30" />
       </div>
 
       <div className="relative z-10 max-w-4xl mx-auto px-6 pt-32 pb-20">
-        <Link to="/" className="inline-flex items-center gap-2 text-cyan-400 hover:text-white transition-colors mb-12 uppercase text-xs font-black tracking-widest">
+        {/* POVRATAK */}
+        <Link to="/" className="inline-flex items-center gap-2 text-cyan-400 hover:text-white transition-colors mb-12 uppercase text-[10px] font-black tracking-[0.2em]">
           <FaArrowLeft /> Nazad na Home
         </Link>
 
-        {/* OVDE KORISTIMO motion.div DA SKLONIMO GREŠKU */}
+        {/* SADRŽAJ */}
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white/3 backdrop-blur-3xl border border-white/10 p-10 md:p-16 rounded-[60px]"
+          initial={{ opacity: 0, y: 20 }} 
+          animate={{ opacity: 1, y: 0 }} 
+          className="bg-white/[0.03] backdrop-blur-3xl border border-white/10 p-10 md:p-16 rounded-[60px] shadow-3xl"
         >
-          <h1 className="text-5xl md:text-7xl font-black mb-8 italic tracking-tighter">{projekat.naslov}</h1>
-          <p className="text-blue-100/60 text-lg leading-relaxed">{projekat.detaljanTekst}</p>
+          <h1 className="text-5xl md:text-7xl font-black mb-8 italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-white to-blue-400">
+            {projekat.naslov}
+          </h1>
+          
+          <div className="flex flex-wrap gap-4 mb-10">
+            <span className="bg-cyan-500/10 text-cyan-400 px-4 py-2 rounded-full border border-cyan-500/20 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+              <FaMicroscope /> Medical Research
+            </span>
+            <span className="bg-blue-500/10 text-blue-400 px-4 py-2 rounded-full border border-blue-500/20 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+              <FaCode /> {projekat.tehnologija}
+            </span>
+          </div>
+
+          <div className="prose prose-invert max-w-none">
+            <h2 className="text-cyan-400 text-sm font-black uppercase tracking-[0.3em] mb-6">Tehnička dokumentacija</h2>
+            <p className="text-blue-100/70 text-lg leading-relaxed whitespace-pre-line font-light">
+               {projekat.detaljan_tekst}
+            </p>
+          </div>
         </motion.div>
       </div>
     </div>
   );
 };
 
-export default ProjectDetails; // Proveri da li je ovde cela reč export
+export default ProjectDetails;

@@ -1,5 +1,18 @@
 import React, { useState } from 'react';
 import { supabase } from '../supabaseClient'; 
+const [password, setPassword] = useState('');
+const [isAuthorized, setIsAuthorized] = useState(false);
+
+const handleLogin = (e) => {
+  e.preventDefault();
+  // Ovde stavi šifru koju samo ti znaš
+  if (password === 'zdravko123') { 
+    setIsAuthorized(true);
+  } else {
+    alert('Pristup odbijen. Pogrešna licenca.');
+  }
+};
+
 
 const AdminPanel = () => {
   const [formData, setFormData] = useState({

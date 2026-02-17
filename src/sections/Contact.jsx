@@ -30,9 +30,9 @@ const Contact = () => {
             transition={{ delay: 0.2 }}
             className="space-y-8"
           >
-            <h3 className="text-2xl font-bold text-white mb-6">Hajde da razgovaramo o budućnosti medicine.</h3>
+            <h3 className="text-2xl font-bold text-white mb-6">Let’s explore the future of healthcare together</h3>
             <p className="text-blue-100/60 text-lg font-light leading-relaxed">
-              Bilo da ste zainteresovani za saradnju na AI projektima ili želite da razmenimo naučna iskustva, slobodno mi pišite.
+              Whether you're looking to collaborate on AI initiatives or exchange scientific expertise, feel free to get in touch.
             </p>
 
             <div className="space-y-6">
@@ -85,7 +85,7 @@ const Contact = () => {
 
 
               <button className="w-full bg-linear-to-r from-blue-600 to-cyan-500 text-white font-black py-5 rounded-2xl uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_0_30px_rgba(37,99,235,0.3)] cursor-pointer">
-                Pošalji poruku
+                SEND A MESSAGE
               </button>
             </form>
           </motion.div>

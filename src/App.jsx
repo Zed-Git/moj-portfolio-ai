@@ -36,8 +36,8 @@ const Home = () => (
       </p>
 
       <div className="flex flex-wrap gap-8 justify-center">
-        <a href="#projects" className="bg-white text-black px-12 py-5 rounded-2xl font-black text-sm tracking-widest hover:bg-cyan-400 transition-all uppercase inline-block">Projekti</a>
-        <a href="#contact" className="bg-white/5 text-white border border-white/10 px-12 py-5 rounded-2xl font-black text-sm tracking-widest hover:bg-white/20 transition-all uppercase inline-block">Kontakt</a>
+        <a href="#projects" className="bg-white text-black px-12 py-5 rounded-2xl font-black text-sm tracking-widest hover:bg-cyan-400 transition-all uppercase inline-block">Projects</a>
+        <a href="#contact" className="bg-white/5 text-white border border-white/10 px-12 py-5 rounded-2xl font-black text-sm tracking-widest hover:bg-white/20 transition-all uppercase inline-block">Contact</a>
       </div>
     </motion.div>
 

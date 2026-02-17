@@ -66,7 +66,7 @@ const Projects = () => {
                 </div>
 
                 <Link to={`/project/${projekat.id}`} className="flex items-center text-cyan-400 text-[10px] font-black tracking-[0.2em] uppercase cursor-pointer group-hover:text-white transition-colors border-t border-white/5 pt-6">
-                  Tehnička dokumentacija <span className="ml-2 group-hover:translate-x-2 transition-transform">→</span>
+                  Technical documentation <span className="ml-2 group-hover:translate-x-2 transition-transform">→</span>
                 </Link>
               </div>
             </motion.div>

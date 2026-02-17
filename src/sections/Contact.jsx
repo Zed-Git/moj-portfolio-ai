@@ -15,7 +15,7 @@ const Contact = () => {
           className="text-center mb-20"
         >
           <h2 className="text-4xl md:text-5xl font-black text-white uppercase tracking-[0.2em] mb-4">
-            Kontakt
+            Contact
           </h2>
           <div className="w-20 h-1 bg-cyan-500 mx-auto rounded-full shadow-[0_0_15px_rgba(34,211,238,0.8)]"></div>
         </motion.div>

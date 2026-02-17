@@ -49,7 +49,7 @@ const ProjectDetails = () => {
       <div className="min-h-screen bg-[#03040b] flex flex-col items-center justify-center">
         <h2 className="text-white text-xl mb-6">Projekat nije pronađen u arhivi.</h2>
         <Link to="/" className="text-cyan-400 uppercase text-xs font-black tracking-widest hover:text-white transition-colors">
-          Vrati se na Home
+          Back to Home
         </Link>
       </div>
     );
@@ -65,7 +65,7 @@ const ProjectDetails = () => {
       <div className="relative z-10 max-w-4xl mx-auto px-6 pt-32 pb-20">
         {/* POVRATAK */}
         <Link to="/" className="inline-flex items-center gap-2 text-cyan-400 hover:text-white transition-colors mb-12 uppercase text-[10px] font-black tracking-[0.2em]">
-          <FaArrowLeft /> Nazad na Home
+          <FaArrowLeft /> Back to Home
         </Link>
 
         {/* SADRŽAJ */}

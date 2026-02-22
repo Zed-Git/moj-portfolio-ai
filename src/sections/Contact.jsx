@@ -14,7 +14,7 @@ const Contact = () => {
     
     // HIRURŠKI ZAHVAT: Slanje podataka Formspree kuriru
     // OVDE ZAMENI 'tvoj_link_sa_formspree' PRAVIM LINKOM KOJI SI DOBIO
-    const response = await fetch("https://formspree.io/f/tvoj_link_sa_formspree", {
+    const response = await fetch("https://formspree.io/f/mojnpqje", {
       method: "POST",
       body: formData,
       headers: { 'Accept': 'application/json' }

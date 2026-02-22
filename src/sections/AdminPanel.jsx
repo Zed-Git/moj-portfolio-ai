@@ -146,33 +146,31 @@ const AdminPanel = () => {
           </form>
         </div>
 
-        {/* LISTA PROJEKATA SA OPCIJOM BRISANJA */}
-        <div className="space-y-4 text-left">
-          <h3 className="text-white/30 uppercase text-[10px] font-black tracking-[0.3em] ml-4 mb-6 italic">Upravljanje bazom podataka</h3>
-          {projekti.map(p => (
-            /* Zamenili smo običan div sa motion.div da iskoristimo uvoz */
-            <motion.div 
-              whileHover={{ x: 10 }} 
-              key={p.id} 
-              className="bg-white/5 p-6 rounded-3xl border border-white/5 flex justify-between items-center group"
-            >
-              <span className="font-bold text-white group-hover:text-cyan-400 transition-colors uppercase tracking-tight">
-                {p.naslov}
-              </span>
-              <div className="flex gap-3">
-                <button 
-                  onClick={() => {setEditingId(p.id); setFormData(p); window.scrollTo(0,0)}} 
-                  className="text-cyan-400 p-3 bg-white/5 rounded-2xl hover:bg-cyan-500 hover:text-black transition-all"
-                >
-                  <FaEdit />
-                </button>
-                <button 
-                  onClick={() => handleDelete(p.id, p.naslov)} 
-                  className="text-red-400 p-3 bg-white/5 rounded-2xl hover:bg-red-500 hover:text-white transition-all"
-                >
-                  <FaTrash />
-                </button>
-              </div>
+       {/* --- SEKCIJA ZA UPLOAD FAJLA (Poboljšana vidljivost) --- */}
+<div className="bg-cyan-500/5 border-2 border-dashed border-cyan-500/20 p-8 rounded-3xl text-center group hover:border-cyan-500/50 transition-all">
+  <label className="block text-cyan-400 text-[10px] font-black uppercase tracking-[0.2em] mb-4">
+    Izaberite digitalni materijal
+  </label>
+  
+  <input 
+    type="file" 
+    accept="image/*,video/*" 
+    onChange={handleFileUpload} 
+    disabled={uploading} 
+    className="block w-full text-sm text-slate-300
+      file:mr-4 file:py-2.5 file:px-6
+      file:rounded-full file:border-0
+      file:text-xs file:font-black file:uppercase file:tracking-widest
+      file:bg-cyan-500 file:text-black
+      hover:file:bg-cyan-400 file:cursor-pointer file:transition-all"
+  />
+  
+  {uploading && (
+    <p className="text-cyan-400 text-[10px] mt-4 animate-pulse flex items-center justify-center gap-2">
+      <FaSpinner className="animate-spin" /> TRANSFER U TOKU...
+    </p>
+  )}
+</div>
             </motion.div>
           ))}
         </div>

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient'; 
-import { motion } from 'framer-motion';
 import { FaLock, FaSignOutAlt, FaEdit, FaTrash, FaSpinner, FaInfoCircle } from 'react-icons/fa';
 
 const AdminPanel = () => {

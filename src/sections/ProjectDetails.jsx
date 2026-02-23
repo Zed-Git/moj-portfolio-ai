@@ -55,43 +55,26 @@ const ProjectDetails = () => {
     );
   }
 
-  return (
+return (
     <div className="relative min-h-screen w-full bg-[#03040b] text-white">
-      {/* POZADINA */}
       <div className="fixed inset-0 z-0">
         <img src={bgFlare} alt="BG" className="w-full h-full object-cover opacity-30" />
       </div>
 
       <div className="relative z-10 max-w-4xl mx-auto px-6 pt-32 pb-20">
-        {/* POVRATAK */}
-        <Link to="/" className="inline-flex items-center gap-2 text-cyan-400 hover:text-white transition-colors mb-12 uppercase text-[10px] font-black tracking-[0.2em]">
-          <FaArrowLeft /> Back to Home
+        <Link to="/" className="inline-flex items-center gap-2 text-cyan-400 hover:text-white transition-colors mb-12 uppercase text-xs font-black tracking-widest">
+          <FaArrowLeft /> Nazad na Home
         </Link>
 
-        {/* SADRŽAJ */}
+        {/* Upotrebom motion.div ovde, broj grešaka u VSC pada na nulu */}
         <motion.div 
-          initial={{ opacity: 0, y: 20 }} 
-          animate={{ opacity: 1, y: 0 }} 
-          className="bg-white/[0.03] backdrop-blur-3xl border border-white/10 p-10 md:p-16 rounded-[60px] shadow-3xl"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white/3 backdrop-blur-3xl border border-white/10 p-10 md:p-16 rounded-[60px]"
         >
-          <h1 className="text-5xl md:text-7xl font-black mb-8 italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-white to-blue-400">
-            {projekat.naslov}
-          </h1>
-          
-          <div className="flex flex-wrap gap-4 mb-10">
-            <span className="bg-cyan-500/10 text-cyan-400 px-4 py-2 rounded-full border border-cyan-500/20 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-              <FaMicroscope /> Medical Research
-            </span>
-            <span className="bg-blue-500/10 text-blue-400 px-4 py-2 rounded-full border border-blue-500/20 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
-              <FaCode /> {projekat.tehnologija}
-            </span>
-          </div>
-
-          <div className="prose prose-invert max-w-none">
-            <h2 className="text-cyan-400 text-sm font-black uppercase tracking-[0.3em] mb-6">Tehnička dokumentacija</h2>
-            <p className="text-blue-100/70 text-lg leading-relaxed whitespace-pre-line font-light">
-               {projekat.detaljan_tekst}
-            </p>
+          <h1 className="text-5xl md:text-7xl font-black mb-8 italic tracking-tighter">{projekat.naslov}</h1>
+          <div className="bg-linear-to-r from-cyan-500/20 to-transparent p-4 rounded-xl mb-8 border-l-4 border-cyan-500">
+             <p className="text-blue-100/60 text-lg leading-relaxed">{projekat.detaljan_tekst}</p>
           </div>
         </motion.div>
       </div>

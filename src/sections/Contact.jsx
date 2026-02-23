@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion'; // VRATILI SMO 'motion'
+import { AnimatePresence } from 'framer-motion'; // IZBACILI SMO 'motion'
 import { FaEnvelope, FaCheckCircle, FaSpinner } from 'react-icons/fa';
 
 const Contact = () => {

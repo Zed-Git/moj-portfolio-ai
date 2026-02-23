@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { AnimatePresence } from 'framer-motion'; // SAMO OVO
+import { motion, AnimatePresence } from 'framer-motion'; // VRATILI SMO 'motion'
 import { FaEnvelope, FaCheckCircle, FaSpinner } from 'react-icons/fa';
 
 const Contact = () => {
   const [status, setStatus] = useState("IDLE");
+  
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     setStatus("SENDING");
@@ -43,7 +44,7 @@ const Contact = () => {
                   <input name="name" type="text" placeholder="Name" className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white outline-none" required />
                   <input name="email" type="email" placeholder="Email" className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white outline-none" required />
                   <textarea name="message" rows="5" placeholder="Message..." className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white outline-none resize-none" required></textarea>
-                  <button type="submit" disabled={status === "SENDING"} className="w-full bg-cyan-500 text-black font-black py-5 rounded-2xl hover:bg-cyan-400 transition-all flex justify-center items-center gap-3">
+                  <button type="submit" disabled={status === "SENDING"} className="w-full bg-cyan-500 text-black font-black py-5 rounded-2xl uppercase tracking-widest hover:bg-cyan-400 transition-all flex justify-center items-center gap-3">
                     {status === "SENDING" ? <FaSpinner className="animate-spin" /> : "Send Message"}
                   </button>
                 </form>

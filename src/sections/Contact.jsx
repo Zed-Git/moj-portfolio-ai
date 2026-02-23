@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion'; // SAMO OVO
 import { FaEnvelope, FaCheckCircle, FaSpinner } from 'react-icons/fa';
 
 const Contact = () => {

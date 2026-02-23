@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
 html {
+    /* Ovo je hirurški podmazivač za glatko kretanje */
     scroll-behavior: smooth;
+}
+
+body {
+    margin:0px;
+    padding: 0;
+    box-sizing: border-box;
 }

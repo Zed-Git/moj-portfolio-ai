@@ -6,9 +6,9 @@ const AdminAboutEditor = () => {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState('');
 
-  // 1. Prvo definišemo funkciju (da izbegnemo hoisting grešku)
-  const fetchCurrentText = async () => {
-    try {
+  // 1. Učitavamo podatke samo JEDNOM kada se komponenta pojavi
+  useEffect(() => {
+    const fetchCurrentText = async () => {
       const { data } = await supabase
         .from('site_settings')
         .select('content')
@@ -16,12 +16,8 @@ const AdminAboutEditor = () => {
         .single();
       
       if (data) setText(data.content);
-    } catch (fetchError) {
-      console.log("Inicijalno učitavanje...");
-    }
-  };
+    };
 
-  useEffect(() => {
     fetchCurrentText();
   }, []);
 

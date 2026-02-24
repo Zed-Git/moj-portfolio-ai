@@ -27,8 +27,8 @@ const Home = () => (
           alt="Medical AI" 
           className="w-full h-full object-cover opacity-20" 
         />
-        {/* 2. KOREKCIJA TAILWIND KLASE: bg-gradient-to-b -> bg-linear-to-b */}
-        <div className="absolute inset-0 bg-linear-to-b from-[#03040b]/80 via-transparent to-[#03040b]/80"></div>
+        {/* 2. KOREKCIJA TAILWIND KLASE: bg-gradient-to-b -> bg-linear-to-b ...from-[#03040b]/5...TRANSP. SLIKE... */}
+        <div className="absolute inset-0 bg-linear-to-b from-[#03040b]/5 via-transparent to-[#03040b]/50"></div>
       </div>
 
       {/* SADRŽAJ PANELA */}
@@ -38,9 +38,9 @@ const Home = () => (
         </div>
 
         <h1 className="text-7xl md:text-9xl font-black text-white tracking-tighter leading-[0.85] mb-10 drop-shadow-2xl">
-          Zdravko <br />
+          Z. Mijailovic <br />
           <span className="text-transparent bg-clip-text bg-linear-to-tr from-blue-400 via-white to-cyan-300">
-            Mijailović
+            MD, PhD - AI
           </span>
         </h1>
 

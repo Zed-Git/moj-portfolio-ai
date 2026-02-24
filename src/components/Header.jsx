@@ -14,7 +14,7 @@ const Header = () => {
           <img src={medicalLogo} alt="Logo" className="w-full h-full object-cover" />
         </div>
         <span className="text-xl font-black text-white tracking-tighter uppercase">
-          ZDRAVKO <span className="text-cyan-400 font-light">MIJAILOVIĆ</span>
+          Zed <span className="text-cyan-400 font-light">AI-Portfolio</span>
         </span>
       </a>
 

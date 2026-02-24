@@ -7,68 +7,58 @@ const Projects = () => {
   const [projektiIzBaze, setProjektiIzBaze] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // 1. Definišemo funkciju PRVO, pre useEffect-a (Medical Protocol)
   const fetchProjects = async () => {
     try {
       const { data, error } = await supabase
         .from('projects')
         .select('*')
         .order('id', { ascending: true });
+      
       if (error) throw error;
-      setProjektiIzBaze(data);
-    } catch (error) {
-      console.error(error.message);
+      if (data) setProjektiIzBaze(data);
+    } catch (err) {
+      console.error("Greška:", err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => { fetchProjects(); }, []);
+  useEffect(() => {
+    fetchProjects();
+  }, []);
 
-  if (loading) return <div className="text-center text-white py-20 uppercase tracking-widest text-xs">Učitavanje medicinske baze...</div>;
+  if (loading) return <div className="py-24 text-center text-cyan-500 animate-pulse uppercase tracking-widest text-xs">Učitavanje kardioloških studija...</div>;
 
   return (
-    <section id="projects" className="py-24">
+    <section id="projects" className="py-24 bg-black">
       <div className="max-w-7xl mx-auto px-6">
-        <h2 className="text-4xl font-black text-white mb-16 uppercase tracking-[0.2em] text-center">AI Projects</h2>
+        <h2 className="text-4xl font-black text-white mb-16 text-center uppercase tracking-[0.2em] italic">
+          AI <span className="text-cyan-500">Projects</span>
+        </h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-          {projektiIzBaze.map((projekat, index) => (
-            <motion.div 
-              key={projekat.id}
-              initial={{ opacity: 0, y: 30 }}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 text-left">
+          {projektiIzBaze.map((project, index) => (
+            <motion.div
+              key={project.id}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              className="bg-[#03040b]/40 backdrop-blur-xl border border-white/10 rounded-[40px] overflow-hidden group hover:border-cyan-500/30 transition-all shadow-2xl flex flex-col h-full"
+              transition={{ delay: index * 0.1 }}
+              className="group relative bg-white/5 rounded-3xl overflow-hidden border border-white/10 hover:border-cyan-500/50 transition-all duration-500"
             >
-              {/* MULTIMEDIJA */}
-              <div className="h-64 w-full bg-black overflow-hidden relative">
-                {projekat.tip_medija === "slika" ? (
-                  <img src={projekat.izvor_medija} alt={projekat.naslov} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                ) : (
-                  <video src={projekat.izvor_medija} autoPlay muted loop playsInline onEnded={(e) => e.target.play()} className="w-full h-full object-cover" />
-                )}
-                <div className="absolute inset-0 bg-linear-to-t from-[#03040b] to-transparent opacity-60"></div>
-              </div>
-
-              {/* SADRŽAJ KARTICE */}
-              <div className="p-8 flex flex-col flex-grow">
-                <h3 className="text-xl font-bold text-white uppercase mb-4 tracking-tight">{projekat.naslov}</h3>
-                <p className="text-blue-100/60 leading-relaxed font-light mb-6 text-sm line-clamp-3">{projekat.opis}</p>
-                
-                {/* DODAJEMO BEDŽEVE ZA TEHNOLOGIJE */}
-                <div className="flex flex-wrap gap-2 mt-auto mb-8">
-                   {projekat.tehnologija?.split(',').map((tech) => (
-                     <span key={tech} className="px-3 py-1 bg-white/5 rounded-full border border-white/10 text-[9px] text-cyan-400 font-bold uppercase tracking-widest">
-                       {tech.trim()}
-                     </span>
-                   ))}
+              <Link to={`/project/${project.id}`}>
+                <div className="aspect-video overflow-hidden">
+                  <img 
+                    src={project.slika_url} 
+                    alt={project.naslov}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
                 </div>
-
-                <Link to={`/project/${projekat.id}`} className="flex items-center text-cyan-400 text-[10px] font-black tracking-[0.2em] uppercase cursor-pointer group-hover:text-white transition-colors border-t border-white/5 pt-6">
-                  Technical documentation <span className="ml-2 group-hover:translate-x-2 transition-transform">→</span>
-                </Link>
-              </div>
+                <div className="p-8">
+                  <h3 className="text-xl font-bold text-white mb-3 uppercase tracking-tight">{project.naslov}</h3>
+                  <p className="text-slate-400 text-sm font-light leading-relaxed line-clamp-3">{project.opis}</p>
+                </div>
+              </Link>
             </motion.div>
           ))}
         </div>
@@ -76,4 +66,5 @@ const Projects = () => {
     </section>
   );
 };
+
 export default Projects;

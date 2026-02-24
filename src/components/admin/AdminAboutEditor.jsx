@@ -6,22 +6,22 @@ const AdminAboutEditor = () => {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState('');
 
-  // 1. Čista funkcija za učitavanje
-  useEffect(() => {
-    const fetchCurrentText = async () => {
-      try {
-        const { data } = await supabase
-          .from('site_settings')
-          .select('content')
-          .eq('section_name', 'about_me')
-          .single();
-        
-        if (data) setText(data.content);
-      } catch (err) {
-        console.log("Inicijalizacija...");
-      }
-    };
+  // 1. Prvo definišemo funkciju (da izbegnemo hoisting grešku)
+  const fetchCurrentText = async () => {
+    try {
+      const { data } = await supabase
+        .from('site_settings')
+        .select('content')
+        .eq('section_name', 'about_me')
+        .single();
+      
+      if (data) setText(data.content);
+    } catch (fetchError) {
+      console.log("Inicijalno učitavanje...");
+    }
+  };
 
+  useEffect(() => {
     fetchCurrentText();
   }, []);
 
@@ -47,12 +47,11 @@ const AdminAboutEditor = () => {
 
   return (
     <div className="bg-white/5 p-6 rounded-2xl border border-white/10 text-left">
-      {/* UKLONILI SMO DUPLI CSS: Sada je samo text-cyan-400 */}
       <h3 className="text-lg font-bold text-cyan-400 mb-4 italic uppercase tracking-widest">
         Uredi "O meni" sekciju
       </h3>
       <textarea
-        className="w-full h-48 bg-black/50 text-blue-100 p-4 rounded-xl border border-white/10 focus:border-cyan-400 outline-none transition-all mb-4 font-light leading-relaxed"
+        className="w-full h-48 bg-black/50 text-blue-100 p-4 rounded-xl border border-white/10 focus:border-cyan-400 outline-none transition-all mb-4 font-light leading-relaxed text-sm"
         value={text}
         onChange={(e) => setText(e.target.value)}
       />

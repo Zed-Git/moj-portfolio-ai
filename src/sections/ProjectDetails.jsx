@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { FaArrowLeft, FaCode, FaMicroscope } from 'react-icons/fa';
 import { supabase } from '../supabaseClient';
 import bgFlare from '../assets/bg-flare.jpg';
@@ -13,7 +12,7 @@ const ProjectDetails = () => {
   useEffect(() => {
     const fetchOneProject = async () => {
       setLoading(true);
-      const { data, error } = await supabase.from('projects').select('*').eq('id', id).single();
+      const { data } = await supabase.from('projects').select('*').eq('id', id).single();
       if (data) setProjekat(data);
       setLoading(false);
     };

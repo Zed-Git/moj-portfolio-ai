@@ -16,7 +16,7 @@ const AdminAboutEditor = () => {
           .single();
         if (data) setText(data.content);
       } catch (error) {
-        console.log("Inicijalizacija About sekcije...");
+        console.log("Inicijalno učitavanje About sekcije...");
       }
     };
     fetchCurrentText();
@@ -40,17 +40,17 @@ const AdminAboutEditor = () => {
 
   return (
     <div className="bg-white/5 p-6 rounded-2xl border border-white/10 text-left">
-      <h3 className="text-lg font-bold text-cyan-400 mb-4 italic uppercase tracking-widest">Uredi "O meni" sekciju</h3>
+      <h3 className="text-lg font-bold text-cyan-400 mb-4 italic uppercase tracking-widest text-left">Uredi "O meni" sekciju</h3>
       <textarea
-        className="w-full h-48 bg-black/50 text-blue-100 p-4 rounded-xl border border-white/10 focus:border-cyan-400 outline-none transition-all mb-4 font-light leading-relaxed text-sm"
+        className="w-full h-48 bg-black/50 text-blue-100 p-4 rounded-xl border border-white/10 focus:border-cyan-400 outline-none transition-all mb-4 font-light leading-relaxed text-sm text-left"
         value={text}
         onChange={(e) => setText(e.target.value)}
       />
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 text-left">
         <button onClick={handleSave} disabled={loading} className="px-8 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-lg transition-all text-xs uppercase tracking-widest">
           {loading ? 'Čuvanje...' : 'Sačuvaj'}
         </button>
-        {status && <span className="text-xs font-mono text-cyan-400">{status}</span>}
+        {status && <span className="text-xs font-mono text-cyan-400 italic">{status}</span>}
       </div>
     </div>
   );

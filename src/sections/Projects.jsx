@@ -14,7 +14,7 @@ const Projects = () => {
         if (error) throw error;
         setProjektiIzBaze(data || []);
       } catch (err) {
-        console.error("Greška pri učitavanju:", err.message);
+        console.error("Greška:", err.message);
       } finally {
         setLoading(false);
       }
@@ -22,12 +22,12 @@ const Projects = () => {
     fetchProjects();
   }, []);
 
-  if (loading) return <div className="py-24 text-center text-cyan-500 animate-pulse uppercase tracking-widest text-xs font-sans">Učitavanje medicinske baze...</div>;
+  if (loading) return <div className="py-24 text-center text-cyan-500 animate-pulse uppercase tracking-widest text-xs font-sans">Učitavanje kardiološke baze...</div>;
 
   return (
     <section id="projects" className="py-24 bg-black font-sans text-left">
       <div className="max-w-7xl mx-auto px-6 text-left">
-        <motion.h2 initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} className="text-4xl font-black text-white mb-16 text-center uppercase tracking-[0.2em] italic">
+        <motion.h2 initial={{ opacity: 0, y: -20 }} whileInView={{ opacity: 1, y: 0 }} className="text-4xl font-black text-white mb-16 text-center uppercase tracking-[0.2em] italic">
           AI <span className="text-cyan-500 font-bold">Projects</span>
         </motion.h2>
         
@@ -45,7 +45,7 @@ const Projects = () => {
                   {project.slika_url ? (
                     <img src={project.slika_url} alt={project.naslov} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-slate-700 uppercase text-[10px] tracking-widest italic">No image available</div>
+                    <div className="w-full h-full flex items-center justify-center text-slate-700 uppercase text-[10px] tracking-widest italic font-sans">No image available</div>
                   )}
                 </div>
                 <div className="p-8 text-left">

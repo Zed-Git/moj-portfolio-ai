@@ -6,7 +6,6 @@ const AdminAboutEditor = () => {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState('');
 
-  // 1. Definišemo funkciju korišćenjem useCallback da izbegnemo React upozorenja
   const fetchCurrentText = useCallback(async () => {
     try {
       const { data, error } = await supabase
@@ -18,11 +17,10 @@ const AdminAboutEditor = () => {
       if (data) setText(data.content);
       if (error) console.log("Prvi unos u bazu?");
     } catch (err) {
-      console.error("Greška pri učitavanju:", err);
+      console.error(err);
     }
   }, []);
 
-  // 2. useEffect sada poziva već definisanu funkciju
   useEffect(() => {
     fetchCurrentText();
   }, [fetchCurrentText]);
@@ -49,14 +47,17 @@ const AdminAboutEditor = () => {
 
   return (
     <div className="bg-white/5 p-6 rounded-2xl border border-white/10 text-left">
-      <h3 className="text-lg font-bold text-white mb-4 italic text-cyan-400 uppercase tracking-widest">
+      {/* Popravljene klase: text-cyan-400 je dovoljno, izbacili smo text-white */}
+      <h3 className="text-lg font-bold text-cyan-400 mb-4 italic uppercase tracking-widest">
         Uredi "O meni" sekciju
       </h3>
+      
       <textarea
-        className="w-full h-48 bg-black/50 text-blue-100 p-4 rounded-xl border border-white/10 focus:border-cyan-400 outline-none transition-all mb-4 font-light"
+        className="w-full h-48 bg-black/50 text-blue-100 p-4 rounded-xl border border-white/10 focus:border-cyan-400 outline-none transition-all mb-4 font-light leading-relaxed"
         value={text}
         onChange={(e) => setText(e.target.value)}
       />
+
       <div className="flex items-center gap-4">
         <button
           onClick={handleSave}
@@ -65,7 +66,7 @@ const AdminAboutEditor = () => {
         >
           {loading ? 'Čuvanje...' : 'Sačuvaj'}
         </button>
-        {status && <span className="text-xs font-mono text-cyan-400 animate-pulse">{status}</span>}
+        {status && <span className="text-xs font-mono text-cyan-400">{status}</span>}
       </div>
     </div>
   );

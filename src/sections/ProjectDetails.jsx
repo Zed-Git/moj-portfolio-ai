@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+// eslint-disable-next-line
+import { motion } from 'framer-motion';
 import { FaArrowLeft, FaCode, FaMicroscope } from 'react-icons/fa';
 import { supabase } from '../supabaseClient';
 import bgFlare from '../assets/bg-flare.jpg';

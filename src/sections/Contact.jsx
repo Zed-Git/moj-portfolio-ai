@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion'; 
+// eslint-disable-next-line
+import { motion, AnimatePresence } from 'framer-motion';
 import { FaEnvelope, FaCheckCircle, FaSpinner } from 'react-icons/fa';
 
 const Contact = () => {

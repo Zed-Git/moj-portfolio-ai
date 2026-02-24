@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient'; 
+// eslint-disable-next-line
 import { motion } from 'framer-motion';
 import { FaEdit, FaTrash, FaSpinner, FaInfoCircle, FaSignOutAlt } from 'react-icons/fa';
 

@@ -37,7 +37,6 @@ const AdminPanel = () => {
     setLoading(false);
   };
 
-  // GLAVNA FUNKCIJA ZA DODAVANJE PROJEKTA SA SLIKOM
   const handleAddProject = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -51,35 +50,24 @@ const AdminPanel = () => {
         const { data } = supabase.storage.from('media').getPublicUrl(fileName);
         slikaUrl = data.publicUrl;
       }
-
       const { error } = await supabase.from('projects').insert([{ naslov, opis, slika_url: slikaUrl }]);
       if (error) throw error;
-
       alert("Projekat uspešno dodat!");
       setNaslov(''); setOpis(''); setFile(null); setShowAddForm(false);
       fetchProjects();
-    } catch (err) {
-      alert("Greška: " + err.message);
-    }
+    } catch (err) { alert(err.message); }
     setLoading(false);
-  };
-
-  const deleteProject = async (id) => {
-    if (window.confirm("Da li ste sigurni da želite da obrišete ovaj projekat?")) {
-      await supabase.from('projects').delete().eq('id', id);
-      fetchProjects();
-    }
   };
 
   if (!session) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-6 text-white font-sans text-left">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-slate-900 p-10 rounded-3xl border border-white/10 w-full max-w-md shadow-2xl text-left">
-          <h2 className="text-2xl font-black mb-8 uppercase tracking-widest italic text-center text-white">ZED <span className="text-cyan-500 font-bold">ADMIN</span></h2>
-          <form onSubmit={handleLogin} className="space-y-4">
+      <div className="min-h-screen bg-black flex items-center justify-center p-6 text-white font-sans">
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-slate-900 p-10 rounded-3xl border border-white/10 w-full max-w-md shadow-2xl">
+          <h2 className="text-2xl font-black mb-8 uppercase tracking-widest italic text-center">Zed Admin</h2>
+          <form onSubmit={handleLogin} className="space-y-4 text-left">
             <input type="email" placeholder="Email" className="w-full p-4 bg-black border border-white/10 rounded-xl text-white outline-none focus:border-cyan-500" value={email} onChange={(e) => setEmail(e.target.value)} required />
             <input type="password" placeholder="Password" className="w-full p-4 bg-black border border-white/10 rounded-xl text-white outline-none focus:border-cyan-500" value={password} onChange={(e) => setPassword(e.target.value)} required />
-            <button type="submit" className="w-full py-4 bg-cyan-600 hover:bg-cyan-500 text-white font-black rounded-xl transition-all uppercase tracking-widest pt-5">
+            <button type="submit" className="w-full py-4 bg-cyan-600 hover:bg-cyan-500 text-white font-black rounded-xl transition-all uppercase tracking-widest">
               {loading ? <FaSpinner className="animate-spin mx-auto text-xl" /> : 'Enter System'}
             </button>
           </form>
@@ -89,16 +77,15 @@ const AdminPanel = () => {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white p-6 md:p-12 text-left font-sans">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-screen bg-black text-white p-6 md:p-12 text-left font-sans">
       <div className="max-w-6xl mx-auto">
         <header className="flex justify-between items-center mb-16 border-b border-white/10 pb-8">
-          <h1 className="text-3xl font-black italic tracking-widest uppercase">Admin <span className="text-cyan-500 italic text-left">Panel</span></h1>
+          <h1 className="text-3xl font-black italic tracking-widest uppercase text-left">Admin <span className="text-cyan-500">Panel</span></h1>
           <button onClick={() => supabase.auth.signOut()} className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-500 rounded-lg font-bold text-xs uppercase tracking-widest border border-red-500/20 hover:bg-red-500 hover:text-white transition-all">
             <FaSignOutAlt /> Sign Out
           </button>
         </header>
 
-        {/* PROJEKTI INVENTORY */}
         <section className="mb-24 text-left">
           <div className="flex justify-between items-center mb-12">
             <h2 className="text-xl font-bold text-cyan-400 uppercase tracking-widest italic text-left">Projects Inventory</h2>
@@ -129,28 +116,27 @@ const AdminPanel = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-left">
             {projekti.map((proj) => (
-              <motion.div key={proj.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-white/5 p-6 rounded-2xl border border-white/10 flex flex-col justify-between hover:border-cyan-500/30 transition-all min-h-[200px] text-left">
+              <div key={proj.id} className="bg-white/5 p-6 rounded-2xl border border-white/10 flex flex-col justify-between hover:border-cyan-500/30 transition-all min-h-[160px] text-left">
                 <div className="text-left">
-                  <img src={proj.slika_url} alt="" className="w-full h-24 object-cover rounded-lg mb-4 bg-slate-800" />
                   <span className="text-[10px] text-cyan-500 font-mono mb-2 block italic uppercase tracking-widest text-left">Record ID: {proj.id}</span>
                   <p className="font-bold text-sm uppercase tracking-tight text-white mb-2 text-left">{proj.naslov}</p>
                   <p className="text-[11px] text-slate-500 line-clamp-2 font-light text-left">{proj.opis}</p>
                 </div>
                 <div className="flex justify-end gap-4 mt-6 text-slate-500 border-t border-white/5 pt-4">
                   <FaEdit className="hover:text-cyan-400 cursor-pointer text-lg transition-colors" />
-                  <FaTrash onClick={() => deleteProject(proj.id)} className="hover:text-red-500 cursor-pointer text-lg transition-colors" />
+                  <FaTrash className="hover:text-red-500 cursor-pointer text-lg transition-colors" />
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </section>
 
-        <section className="mt-20 pt-20 border-t border-white/5 text-left text-white">
+        <section className="mt-20 pt-20 border-t border-white/5 text-left text-white font-sans">
           <h2 className="text-xl font-bold text-cyan-400 uppercase tracking-widest mb-10 italic text-left">Global Site Content</h2>
           <AdminAboutEditor />
         </section>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

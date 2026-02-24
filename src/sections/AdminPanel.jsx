@@ -15,7 +15,6 @@ const AdminPanel = () => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
     });
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
@@ -36,7 +35,7 @@ const AdminPanel = () => {
     e.preventDefault();
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) alert("Greška: " + error.message);
+    if (error) alert(error.message);
     setLoading(false);
   };
 
@@ -47,55 +46,45 @@ const AdminPanel = () => {
 
   if (!session) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center p-6 text-white">
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.9 }} 
-          animate={{ opacity: 1, scale: 1 }} 
-          className="bg-slate-900 p-10 rounded-3xl border border-white/10 w-full max-w-md shadow-2xl"
-        >
-          <h2 className="text-2xl font-black mb-8 uppercase tracking-widest italic text-center">
-            Zed <span className="text-cyan-500 font-bold">Admin</span>
-          </h2>
+      <div className="min-h-screen bg-black flex items-center justify-center p-6 text-white font-sans">
+        <div className="bg-slate-900 p-10 rounded-3xl border border-white/10 w-full max-w-md">
+          <h2 className="text-2xl font-black mb-8 uppercase tracking-widest text-center">Zed Admin</h2>
           <div className="space-y-4">
             <input 
-              type="email" placeholder="Email" 
-              className="w-full p-4 bg-black border border-white/10 rounded-xl text-white focus:border-cyan-500 outline-none transition-all"
+              type="email" placeholder="Email" className="w-full p-4 bg-black border border-white/10 rounded-xl text-white outline-none"
               value={email} onChange={(e) => setEmail(e.target.value)}
             />
             <input 
-              type="password" placeholder="Lozinka" 
-              className="w-full p-4 bg-black border border-white/10 rounded-xl text-white focus:border-cyan-500 outline-none transition-all"
+              type="password" placeholder="Password" className="w-full p-4 bg-black border border-white/10 rounded-xl text-white outline-none"
               value={password} onChange={(e) => setPassword(e.target.value)}
             />
-            <button 
-              onClick={handleLogin} 
-              className="w-full py-4 bg-cyan-600 hover:bg-cyan-500 text-white font-black rounded-xl transition-all uppercase tracking-widest"
-            >
+            <button onClick={handleLogin} className="w-full py-4 bg-cyan-600 hover:bg-cyan-500 text-white font-black rounded-xl transition-all">
               {loading ? <FaSpinner className="animate-spin mx-auto text-xl" /> : 'Enter'}
             </button>
           </div>
-        </motion.div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black text-white p-6 md:p-12 text-left">
+    <div className="min-h-screen bg-black text-white p-6 md:p-12 text-left font-sans">
       <div className="max-w-6xl mx-auto">
-        <header className="flex justify-between items-center mb-16 border-b border-white/10 pb-8">
+        {/* HEADER */}
+        <div className="flex justify-between items-center mb-16 border-b border-white/10 pb-8">
           <h1 className="text-3xl font-black italic tracking-widest uppercase">
-            Admin <span className="text-cyan-500">Dashboard</span>
+            Admin <span className="text-cyan-500">Panel</span>
           </h1>
-          <button onClick={handleLogout} className="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-lg transition-all text-xs font-bold uppercase tracking-widest border border-red-500/20">
+          <button onClick={handleLogout} className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-500 rounded-lg font-bold text-xs uppercase tracking-widest border border-red-500/20">
             <FaSignOutAlt /> Sign Out
           </button>
-        </header>
+        </div>
 
-        {/* SEKCIJA ZA PROJEKTE */}
+        {/* PROJEKTI (Vratili smo listu) */}
         <section className="mb-24">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-xl font-bold text-cyan-400 uppercase tracking-widest italic">Projects Inventory</h2>
-            <button className="bg-cyan-600 p-3 rounded-full hover:scale-110 transition-all shadow-lg shadow-cyan-500/20 text-white">
+            <button className="bg-cyan-600 p-3 rounded-full hover:scale-110 transition-all text-white">
               <FaPlus />
             </button>
           </div>
@@ -103,20 +92,24 @@ const AdminPanel = () => {
             {projekti.map((proj) => (
               <motion.div 
                 key={proj.id} 
-                whileHover={{ y: -5 }}
-                className="bg-white/5 p-6 rounded-2xl border border-white/10 flex justify-between items-center hover:border-cyan-500/50 transition-all"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white/5 p-6 rounded-2xl border border-white/10 flex justify-between items-center hover:bg-white/10 transition-all"
               >
-                <span className="text-sm font-medium text-slate-300 uppercase truncate pr-4">{proj.naslov}</span>
+                <div className="truncate pr-4">
+                   <p className="text-xs text-cyan-500 font-mono mb-1">ID: {proj.id}</p>
+                   <p className="font-bold text-sm uppercase tracking-tight">{proj.naslov}</p>
+                </div>
                 <div className="flex gap-4 text-slate-500">
-                  <FaEdit className="hover:text-cyan-400 cursor-pointer transition-colors text-lg" />
-                  <FaTrash className="hover:text-red-500 cursor-pointer transition-colors text-lg" />
+                  <FaEdit className="hover:text-cyan-400 cursor-pointer text-lg transition-colors" />
+                  <FaTrash className="hover:text-red-500 cursor-pointer text-lg transition-colors" />
                 </div>
               </motion.div>
             ))}
           </div>
         </section>
 
-        {/* SEKCIJA ZA ABOUT TEKST */}
+        {/* ABOUT EDITOR (Tvoj novi modul) */}
         <section className="mt-20 pt-20 border-t border-white/5">
           <h2 className="text-xl font-bold text-cyan-400 uppercase tracking-widest mb-10 italic">Global Site Content</h2>
           <AdminAboutEditor />

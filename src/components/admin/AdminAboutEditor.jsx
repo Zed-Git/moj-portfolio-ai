@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../../supabaseClient';
 
 const AdminAboutEditor = () => {
@@ -6,24 +6,24 @@ const AdminAboutEditor = () => {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState('');
 
-  const fetchCurrentText = useCallback(async () => {
-    try {
-      const { data, error } = await supabase
-        .from('site_settings')
-        .select('content')
-        .eq('section_name', 'about_me')
-        .single();
-      
-      if (data) setText(data.content);
-      if (error) console.log("Prvi unos u bazu?");
-    } catch (err) {
-      console.error(err);
-    }
-  }, []);
-
+  // 1. Čista funkcija za učitavanje
   useEffect(() => {
+    const fetchCurrentText = async () => {
+      try {
+        const { data } = await supabase
+          .from('site_settings')
+          .select('content')
+          .eq('section_name', 'about_me')
+          .single();
+        
+        if (data) setText(data.content);
+      } catch (err) {
+        console.log("Inicijalizacija...");
+      }
+    };
+
     fetchCurrentText();
-  }, [fetchCurrentText]);
+  }, []);
 
   const handleSave = async () => {
     setLoading(true);
@@ -47,17 +47,15 @@ const AdminAboutEditor = () => {
 
   return (
     <div className="bg-white/5 p-6 rounded-2xl border border-white/10 text-left">
-      {/* Popravljene klase: text-cyan-400 je dovoljno, izbacili smo text-white */}
+      {/* UKLONILI SMO DUPLI CSS: Sada je samo text-cyan-400 */}
       <h3 className="text-lg font-bold text-cyan-400 mb-4 italic uppercase tracking-widest">
         Uredi "O meni" sekciju
       </h3>
-      
       <textarea
         className="w-full h-48 bg-black/50 text-blue-100 p-4 rounded-xl border border-white/10 focus:border-cyan-400 outline-none transition-all mb-4 font-light leading-relaxed"
         value={text}
         onChange={(e) => setText(e.target.value)}
       />
-
       <div className="flex items-center gap-4">
         <button
           onClick={handleSave}

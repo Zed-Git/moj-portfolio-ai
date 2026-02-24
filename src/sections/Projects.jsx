@@ -10,7 +10,7 @@ const Projects = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const { data, error } = await supabase.from('projects').select('*').order('id', { ascending: true });
+        const { data, error } = await supabase.from('projects').select('*').order('id', { ascending: false });
         if (error) throw error;
         setProjektiIzBaze(data || []);
       } catch (err) {
@@ -22,33 +22,35 @@ const Projects = () => {
     fetchProjects();
   }, []);
 
-  if (loading) return <div className="py-24 text-center text-cyan-500 animate-pulse uppercase tracking-widest text-xs font-sans">Učitavanje medicinske baze...</div>;
+  if (loading) return <div className="py-24 text-center text-cyan-500 animate-pulse uppercase tracking-widest text-xs font-sans">Učitavanje baze podataka...</div>;
 
   return (
     <section id="projects" className="py-24 bg-black font-sans text-left">
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-7xl mx-auto px-6 text-left">
         <motion.h2 initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} className="text-4xl font-black text-white mb-16 text-center uppercase tracking-[0.2em] italic">
-          AI <span className="text-cyan-500">Projects</span>
+          AI <span className="text-cyan-500 font-bold">Projects</span>
         </motion.h2>
         
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 text-left">
           {projektiIzBaze.map((project, index) => (
             <motion.div
               key={project.id}
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="group relative bg-white/5 rounded-3xl overflow-hidden border border-white/10 hover:border-cyan-500/50 transition-all duration-500"
+              className="group relative bg-white/5 rounded-3xl overflow-hidden border border-white/10 hover:border-cyan-500/50 transition-all duration-500 text-left"
             >
               <Link to={`/project/${project.id}`}>
-                <div className="aspect-video overflow-hidden bg-slate-800">
-                  {project.slika_url && (
+                <div className="aspect-video overflow-hidden bg-slate-900">
+                  {project.slika_url ? (
                     <img src={project.slika_url} alt={project.naslov} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-slate-700 uppercase text-[10px] tracking-widest italic">No Image Available</div>
                   )}
                 </div>
-                <div className="p-8">
-                  <h3 className="text-xl font-bold text-white mb-3 uppercase tracking-tight">{project.naslov}</h3>
-                  <p className="text-slate-400 text-sm font-light leading-relaxed line-clamp-3">{project.opis}</p>
+                <div className="p-8 text-left">
+                  <h3 className="text-xl font-bold text-white mb-3 uppercase tracking-tight text-left">{project.naslov}</h3>
+                  <p className="text-slate-400 text-sm font-light leading-relaxed line-clamp-3 text-left">{project.opis}</p>
                 </div>
               </Link>
             </motion.div>

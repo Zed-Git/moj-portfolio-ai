@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../supabaseClient';
 
 const AdminAboutEditor = () => {
@@ -6,8 +6,8 @@ const AdminAboutEditor = () => {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState('');
 
-  // 1. Definišemo funkciju PRVO (da izbegnemo grešku u VS Code)
-  const fetchCurrentText = async () => {
+  // 1. Definišemo funkciju korišćenjem useCallback da izbegnemo React upozorenja
+  const fetchCurrentText = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('site_settings')
@@ -16,16 +16,16 @@ const AdminAboutEditor = () => {
         .single();
       
       if (data) setText(data.content);
-      if (error) console.log("Prvi unos?"); 
+      if (error) console.log("Prvi unos u bazu?");
     } catch (err) {
-      console.error(err);
+      console.error("Greška pri učitavanju:", err);
     }
-  };
+  }, []);
 
-  // 2. Pozivamo je unutar useEffect
+  // 2. useEffect sada poziva već definisanu funkciju
   useEffect(() => {
     fetchCurrentText();
-  }, []);
+  }, [fetchCurrentText]);
 
   const handleSave = async () => {
     setLoading(true);
@@ -49,9 +49,11 @@ const AdminAboutEditor = () => {
 
   return (
     <div className="bg-white/5 p-6 rounded-2xl border border-white/10 text-left">
-      <h3 className="text-lg font-bold text-white mb-4 italic text-cyan-400">Uredi "O meni" sekciju</h3>
+      <h3 className="text-lg font-bold text-white mb-4 italic text-cyan-400 uppercase tracking-widest">
+        Uredi "O meni" sekciju
+      </h3>
       <textarea
-        className="w-full h-48 bg-black/50 text-blue-100 p-4 rounded-xl border border-white/10 focus:border-cyan-500 outline-none transition-all mb-4 font-light leading-relaxed"
+        className="w-full h-48 bg-black/50 text-blue-100 p-4 rounded-xl border border-white/10 focus:border-cyan-400 outline-none transition-all mb-4 font-light"
         value={text}
         onChange={(e) => setText(e.target.value)}
       />
@@ -59,11 +61,11 @@ const AdminAboutEditor = () => {
         <button
           onClick={handleSave}
           disabled={loading}
-          className="px-6 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-lg transition-all text-sm uppercase tracking-widest"
+          className="px-8 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-lg transition-all text-xs uppercase tracking-widest"
         >
-          {loading ? 'ČUVANJE...' : 'SAČUVAJ'}
+          {loading ? 'Čuvanje...' : 'Sačuvaj'}
         </button>
-        {status && <span className="text-xs font-mono text-cyan-400">{status}</span>}
+        {status && <span className="text-xs font-mono text-cyan-400 animate-pulse">{status}</span>}
       </div>
     </div>
   );

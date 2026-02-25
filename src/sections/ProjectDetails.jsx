@@ -22,7 +22,7 @@ const ProjectDetails = () => {
   }, [id]);
 
   if (loading) return (
-    <div className="min-h-screen bg-[#03040b] flex items-center justify-center">
+    <div className="max-w-4xl mx-auto text-left px-6">
       <p className="text-cyan-400 uppercase tracking-widest text-xs animate-pulse font-black font-sans text-center text-left">Loading Medical Data...</p>
     </div>
   );

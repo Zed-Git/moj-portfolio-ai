@@ -27,9 +27,13 @@ const Projects = () => {
   return (
     <section id="projects" className="py-24 bg-black font-sans text-left">
       <div className="max-w-7xl mx-auto px-6 text-left text-white">
-        <motion.h2 initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} className="text-4xl font-black text-white mb-16 text-center uppercase tracking-[0.2em] italic">
-          AI <span className="text-cyan-500 font-bold">Projects</span>
-        </motion.h2>
+  <motion.h2 
+  initial={{ opacity: 0, y: 10 }} 
+  whileInView={{ opacity: 1, y: 0 }}
+  className="text-3xl font-bold mb-12"
+>
+  AI <span className="text-cyan-500">Projects</span>
+</motion.h2>
         
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10 text-left">
           {projektiIzBaze.map((project, index) => (

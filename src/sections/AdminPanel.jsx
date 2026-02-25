@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../supabaseClient'; // TAČNA LINIJA 5
+import { supabase } from '../supabaseClient'; 
 import { motion, AnimatePresence } from 'framer-motion'; 
 import { FaEdit, FaTrash, FaPlus, FaSignOutAlt, FaTimes } from 'react-icons/fa';
-import { supabase } from '../supabaseClient';
+import AdminAboutEditor from '../components/admin/AdminAboutEditor';
 
 const AdminPanel = () => {
   const [projekti, setProjekti] = useState([]);
@@ -59,7 +59,6 @@ const AdminPanel = () => {
     }
   };
 
-  // REŠAVAMO 'loading' GREŠKU - Ako je loading true, koristimo 'motion' ovde!
   if (loading) {
     return (
       <motion.div 
@@ -75,7 +74,6 @@ const AdminPanel = () => {
   }
 
   return (
-    // REŠAVAMO 'motion' GREŠKU - Koristimo ga za lagani ulaz celog panela
     <motion.div 
       initial={{ opacity: 0, y: 10 }} 
       animate={{ opacity: 1, y: 0 }}
@@ -97,7 +95,6 @@ const AdminPanel = () => {
       </header>
 
       <main className="max-w-6xl mx-auto space-y-24">
-        {/* ABOUT MANAGEMENT */}
         <section>
           <div className="flex items-center gap-4 mb-8">
             <div className="h-px grow bg-slate-800"></div>
@@ -109,7 +106,6 @@ const AdminPanel = () => {
           </div>
         </section>
 
-        {/* PROJECTS LAB */}
         <section>
           <div className="flex justify-between items-center mb-10">
             <h2 className="text-[10px] font-bold uppercase tracking-[0.3em] text-blue-500">Project Repository</h2>

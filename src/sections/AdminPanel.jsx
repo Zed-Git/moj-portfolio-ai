@@ -9,7 +9,6 @@ const AdminPanel = () => {
   const [loading, setLoading] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
   
-  // State za formu
   const [newProject, setNewProject] = useState({
     naslov: '',
     opis: '',
@@ -43,7 +42,6 @@ const AdminPanel = () => {
     try {
       const { error } = await supabase.from('projects').insert([newProject]);
       if (error) throw error;
-      
       setNewProject({ naslov: '', opis: '', tehnologija: '', slika_url: '' });
       setIsFormOpen(false);
       fetchProjekti();
@@ -71,137 +69,120 @@ const AdminPanel = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#020617] text-white p-4 md:p-10 font-sans">
+    // Dodat pt-24 (padding top) da admin panel ne bi bio ISPOD tvog glavnog headera
+    <div className="min-h-screen bg-[#020617] text-white p-6 md:p-10 pt-24 font-sans">
       
-      {/* HEADER - STILIZOVAN */}
-      <header className="max-w-6xl mx-auto flex justify-between items-center mb-16">
-        <div>
-          <h1 className="text-4xl font-black bg-linear-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent tracking-tighter">
+      {/* HEADER ADMNA - Čistiji i profesionalniji */}
+      <header className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center mb-16 gap-6">
+        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
+          <h1 className="text-3xl font-black bg-linear-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent tracking-tighter">
             ZED ADMIN <span className="text-white/20">|</span> CONTROL
           </h1>
-          <p className="text-slate-500 text-sm font-mono mt-1 uppercase tracking-widest">Surgical Precision Management</p>
-        </div>
+          <p className="text-slate-500 text-[10px] font-mono mt-1 uppercase tracking-widest">Surgical Precision Management</p>
+        </motion.div>
+
         <button 
           onClick={handleLogout}
-          className="flex items-center gap-2 bg-slate-900 border border-slate-800 hover:border-red-500/50 hover:text-red-400 text-slate-400 px-5 py-2 rounded-xl transition-all shadow-2xl"
+          className="flex items-center gap-2 bg-slate-900 border border-slate-800 hover:border-red-500/50 hover:text-red-400 text-slate-400 px-6 py-2 rounded-full transition-all text-sm"
         >
-          <FaSignOutAlt /> Odjavi se
+          <FaSignOutAlt size={14} /> Odjavi se
         </button>
       </header>
 
-      <main className="max-w-6xl mx-auto space-y-20">
+      <main className="max-w-6xl mx-auto space-y-24">
         
-        {/* SEKCIJA 1: ABOUT EDITOR (Dinamički tekst) */}
-        <section className="relative group">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="h-1 w-12 bg-cyan-500 rounded-full"></div>
-            <h2 className="text-xl font-bold uppercase tracking-widest text-cyan-500">About Section</h2>
+        {/* SECTION: ABOUT EDITOR */}
+        <section>
+          <div className="flex items-center gap-4 mb-8">
+            <div className="h-[1px] flex-grow bg-slate-800"></div>
+            <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-cyan-500">About Management</h2>
+            <div className="h-[1px] flex-grow bg-slate-800"></div>
           </div>
-          <div className="bg-slate-900/40 border border-slate-800 p-8 rounded-3xl backdrop-blur-xl">
+          <div className="bg-slate-900/20 border border-slate-800/50 p-8 rounded-[2rem] backdrop-blur-sm">
              <AdminAboutEditor />
           </div>
         </section>
 
-        {/* SEKCIJA 2: PROJEKTI */}
+        {/* SECTION: PROJECTS */}
         <section>
-          <div className="flex justify-between items-end mb-10">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <div className="h-1 w-12 bg-blue-500 rounded-full"></div>
-                <h2 className="text-xl font-bold uppercase tracking-widest text-blue-500">Project Lab</h2>
-              </div>
-              <p className="text-slate-400 text-sm">Upravljajte svojim naučnim i AI portfoliom</p>
-            </div>
-            
+          <div className="flex justify-between items-center mb-10">
+            <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-blue-500">Project Lab</h2>
             <button 
               onClick={() => setIsFormOpen(!isFormOpen)}
-              className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-bold transition-all ${isFormOpen ? 'bg-red-500 hover:bg-red-600' : 'bg-cyan-600 hover:bg-cyan-500 shadow-lg shadow-cyan-900/20'}`}
+              className={`flex items-center gap-2 px-6 py-2 rounded-full font-bold text-sm transition-all ${isFormOpen ? 'bg-red-500/20 text-red-500 border border-red-500/50' : 'bg-cyan-600 hover:bg-cyan-500 text-white shadow-lg shadow-cyan-900/20'}`}
             >
-              {isFormOpen ? <><FaTimes /> Odustani</> : <><FaPlus /> Novi Projekat</>}
+              {isFormOpen ? <><FaTimes /> Close</> : <><FaPlus /> New Project</>}
             </button>
           </div>
 
-          {/* FORMA ZA DODAVANJE (Pojavljuje se glatko) */}
           <AnimatePresence>
             {isFormOpen && (
               <motion.div 
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="mb-16 bg-slate-900/60 border border-cyan-500/20 p-8 rounded-3xl"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="mb-16 bg-slate-900/40 border border-cyan-500/20 p-8 rounded-3xl"
               >
-                <form onSubmit={handleAddProject} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <label className="text-xs uppercase tracking-widest text-slate-500 font-bold">Osnovni podaci</label>
+                <form onSubmit={handleAddProject} className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-5">
                     <input 
-                      type="text" placeholder="Naslov projekta" required
-                      className="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl focus:border-cyan-500 outline-none transition-all"
+                      type="text" placeholder="Project Title" required
+                      className="w-full bg-slate-950/50 border border-slate-800 p-4 rounded-xl focus:border-cyan-500 outline-none text-sm transition-all"
                       value={newProject.naslov}
                       onChange={(e) => setNewProject({...newProject, naslov: e.target.value})}
                     />
                     <textarea 
-                      placeholder="Detaljan opis naučnog rada..." required rows="5"
-                      className="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl focus:border-cyan-500 outline-none transition-all"
+                      placeholder="Project Description..." required rows="5"
+                      className="w-full bg-slate-950/50 border border-slate-800 p-4 rounded-xl focus:border-cyan-500 outline-none text-sm transition-all"
                       value={newProject.opis}
                       onChange={(e) => setNewProject({...newProject, opis: e.target.value})}
                     />
                   </div>
-                  <div className="space-y-4 flex flex-col">
-                    <label className="text-xs uppercase tracking-widest text-slate-500 font-bold">Metadata & Slika</label>
+                  <div className="space-y-5 flex flex-col">
                     <input 
-                      type="text" placeholder="Tehnologije (npr. React, AI, Python)"
-                      className="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl focus:border-cyan-500 outline-none transition-all"
+                      type="text" placeholder="Technologies (e.g. React, Python)"
+                      className="w-full bg-slate-950/50 border border-slate-800 p-4 rounded-xl focus:border-cyan-500 outline-none text-sm transition-all"
                       value={newProject.tehnologija}
                       onChange={(e) => setNewProject({...newProject, tehnologija: e.target.value})}
                     />
                     <input 
-                      type="text" placeholder="URL Slike (Paste iz Supabase Storage)"
-                      className="w-full bg-slate-950 border border-slate-800 p-4 rounded-xl focus:border-cyan-500 outline-none transition-all"
+                      type="text" placeholder="Image URL"
+                      className="w-full bg-slate-950/50 border border-slate-800 p-4 rounded-xl focus:border-cyan-500 outline-none text-sm transition-all"
                       value={newProject.slika_url}
                       onChange={(e) => setNewProject({...newProject, slika_url: e.target.value})}
                     />
-                    <div className="mt-auto pt-4">
-                      <button type="submit" className="w-full bg-linear-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-black py-4 rounded-xl transition-all tracking-widest">
-                        SAČUVAJ U BAZU PODATAKA
-                      </button>
-                    </div>
+                    <button type="submit" className="mt-auto w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-4 rounded-xl transition-all shadow-xl">
+                      SAVE DATA TO DATABASE
+                    </button>
                   </div>
                 </form>
               </motion.div>
             )}
           </AnimatePresence>
 
-          {/* LISTA PROJEKATA - STARI IZGLED + NOVE FUNKCIJE */}
+          {/* PROJECT LIST */}
           {loading ? (
-            <div className="flex justify-center py-20"><div className="w-10 h-10 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin"></div></div>
+            <div className="text-center py-20 text-slate-600 font-mono text-xs animate-pulse tracking-widest">SYNCHRONIZING WITH SUPABASE...</div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {projekti.map((proj) => (
                 <motion.div 
                   key={proj.id}
                   layout
-                  className="bg-slate-900/40 border border-slate-800 rounded-3xl overflow-hidden hover:border-cyan-500/50 transition-all group"
+                  className="bg-slate-900/30 border border-slate-800/50 rounded-2xl overflow-hidden hover:border-cyan-500/30 transition-all group"
                 >
-                  <div className="h-48 bg-slate-800 overflow-hidden relative">
-                    {proj.slika_url ? (
-                      <img src={proj.slika_url} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-80 group-hover:opacity-100" />
-                    ) : (
-                      <div className="flex items-center justify-center h-full text-slate-600 font-mono text-xs uppercase tracking-widest">No Image Asset</div>
-                    )}
-                    <div className="absolute top-4 left-4 bg-slate-950/90 border border-cyan-500/30 px-3 py-1 rounded-full text-[10px] font-mono text-cyan-400">
-                      ID: {proj.id}
-                    </div>
+                  <div className="h-40 bg-slate-800 overflow-hidden relative">
+                    {proj.slika_url && <img src={proj.slika_url} alt="" className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-all duration-700" />}
+                    <div className="absolute top-3 left-3 bg-slate-950/80 px-2 py-1 rounded font-mono text-[9px] text-cyan-500">ID: {proj.id}</div>
                   </div>
-                  
-                  <div className="p-6">
-                    <h3 className="font-bold text-white uppercase tracking-tight mb-2 group-hover:text-cyan-400 transition-colors">{proj.naslov}</h3>
-                    <p className="text-slate-400 text-xs line-clamp-3 min-h-[48px] leading-relaxed mb-6">{proj.opis}</p>
-                    
+                  <div className="p-5">
+                    <h3 className="font-bold text-white text-sm uppercase tracking-tight mb-2">{proj.naslov}</h3>
+                    <p className="text-slate-500 text-[11px] line-clamp-2 min-h-12 leading-relaxed mb-4">{proj.opis}</p>
                     <div className="flex justify-between items-center pt-4 border-t border-slate-800/50">
-                       <span className="text-[10px] text-slate-600 font-mono uppercase italic">{proj.tehnologija || 'No Tech Stack'}</span>
+                       <span className="text-[9px] text-slate-600 font-mono uppercase italic">{proj.tehnologija || 'AI/Medical'}</span>
                        <div className="flex gap-4">
-                          <button className="text-slate-500 hover:text-cyan-400 transition-colors text-lg cursor-pointer"><FaEdit /></button>
-                          <button onClick={() => handleDelete(proj.id)} className="text-slate-500 hover:text-red-500 transition-colors text-lg cursor-pointer"><FaTrash /></button>
+                          <button className="text-slate-500 hover:text-cyan-400 transition-colors cursor-pointer"><FaEdit size={14} /></button>
+                          <button onClick={() => handleDelete(proj.id)} className="text-slate-500 hover:text-red-500 transition-colors cursor-pointer"><FaTrash size={14} /></button>
                        </div>
                     </div>
                   </div>

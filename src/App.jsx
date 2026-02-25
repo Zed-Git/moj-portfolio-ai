@@ -1,7 +1,5 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-/* 1. DODALI SMO 'SEDATIV' ZA LINTER: */
-// eslint-disable-next-line
 import { motion } from 'framer-motion'; 
 import Header from './components/Header';
 import About from './sections/About';
@@ -13,44 +11,40 @@ import bgFlare from './assets/bg-flare.jpg';
 import medicalLogo from './assets/medical-logo.jpg';
 
 const Home = () => (
-  <main className="max-w-6xl mx-auto pt-60 pb-32">
+  // SMANJEN PT SA 60 NA 32 ZA MOBILNE
+  <main className="max-w-6xl mx-auto pt-32 md:pt-60 pb-32 px-4 md:px-0">
     <motion.div 
-      initial={{ opacity: 0, y: 100, scale: 0.9 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 1.2, delay: 0.2, ease: [0, 0.71, 0.2, 1.01] }}
-      className="bg-[#03040b]/40 backdrop-blur-2xl border border-white/10 p-16 md:p-24 rounded-[80px] shadow-[0_0_50px_rgba(0,0,0,0.5)] text-center relative overflow-hidden"
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 1 }}
+      // SMANJEN PADDING I ZAOBLJENOST ZA MOBILNE
+      className="bg-[#03040b]/40 backdrop-blur-2xl border border-white/10 p-8 md:p-24 rounded-[40px] md:rounded-[80px] shadow-2xl text-center relative overflow-hidden"
     >
-      {/* POZADINSKA SLIKA UNUTAR PANELA */}
       <div className="absolute inset-0 z-0">
-        <img 
-          src={medicalLogo} 
-          alt="Medical AI" 
-          className="w-full h-full object-cover opacity-20" 
-        />
-        {/* 2. KOREKCIJA TAILWIND KLASE: bg-gradient-to-b -> bg-linear-to-b ...from-[#03040b]/5...TRANSP. SLIKE... */}
-        <div className="absolute inset-0 bg-linear-to-b from-[#03040b]/5 via-transparent to-[#03040b]/50"></div>
+        <img src={medicalLogo} alt="Medical AI" className="w-full h-full object-cover opacity-10" />
+        <div className="absolute inset-0 bg-linear-to-b from-[#03040b]/10 to-[#03040b]/70"></div>
       </div>
 
-      {/* SADRŽAJ PANELA */}
       <div className="relative z-10">
-        <div className="inline-block px-5 py-2 mb-10 text-[11px] font-black tracking-[0.4em] text-cyan-400 uppercase border border-cyan-400/20 rounded-full bg-cyan-400/10">
+        <div className="inline-block px-4 py-1.5 mb-6 md:mb-10 text-[9px] md:text-[11px] font-black tracking-[0.3em] text-cyan-400 uppercase border border-cyan-400/20 rounded-full bg-cyan-400/10">
           AI + Health-Tech Precision
         </div>
 
-        <h1 className="text-7xl md:text-9xl font-black text-white tracking-tighter leading-[0.85] mb-10 drop-shadow-2xl">
-          Z. Mijailovic <br />
+        {/* RESPONZIVNI FONT: 4xl na mobilnom, 9xl na desktopu */}
+        <h1 className="text-4xl md:text-7xl lg:text-9xl font-black text-white tracking-tighter leading-tight md:leading-[0.85] mb-8 md:mb-10 drop-shadow-2xl">
+          Z. Mijailovic <br className="hidden md:block" />
           <span className="text-transparent bg-clip-text bg-linear-to-tr from-blue-400 via-white to-cyan-300">
             MD, PhD - AI
           </span>
         </h1>
 
-        <p className="text-xl md:text-2xl text-white/80 max-w-2xl mx-auto mb-16 font-light leading-relaxed italic">
-          <strong>Medicine must evolve from being merely an "individual craft or skill" (techne) into a rigorous science (logos).</strong>
+        <p className="text-base md:text-xl lg:text-2xl text-white/80 max-w-2xl mx-auto mb-10 md:mb-16 font-light leading-relaxed italic">
+          "Medicine must evolve from being merely an individual craft into a rigorous science."
         </p>
 
-        <div className="flex flex-wrap gap-8 justify-center">
-          <a href="#projects" className="bg-white text-black px-12 py-5 rounded-2xl font-black text-sm tracking-widest hover:bg-cyan-400 transition-all uppercase inline-block">Projekti</a>
-          <a href="#contact" className="bg-white/5 text-white border border-white/10 px-12 py-5 rounded-2xl font-black text-sm tracking-widest hover:bg-white/20 transition-all uppercase inline-block">Kontakt</a>
+        <div className="flex flex-col sm:flex-row gap-4 md:gap-8 justify-center items-center">
+          <a href="#projects" className="w-full sm:w-auto bg-white text-black px-10 py-4 rounded-2xl font-black text-xs tracking-widest hover:bg-cyan-400 transition-all uppercase">Projekti</a>
+          <a href="#contact" className="w-full sm:w-auto bg-white/5 text-white border border-white/10 px-10 py-4 rounded-2xl font-black text-xs tracking-widest hover:bg-white/20 transition-all uppercase">Kontakt</a>
         </div>
       </div>
     </motion.div>
@@ -65,19 +59,19 @@ function App() {
   return (
     <Router>
       <div id="home" className="relative min-h-screen w-full bg-[#03040b] text-white overflow-x-hidden font-sans">
+        {/* POZADINSKI FLARE */}
         <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-          <img src={bgFlare} alt="Background" className="w-full h-full object-cover scale-110" />
-          <div className="absolute inset-0 bg-[#03040b]/40 bg-linear-to-b from-[#03040b]/80 via-[#03040b]/20 to-[#03040b]/90"></div>
+          <img src={bgFlare} alt="Background" className="w-full h-full object-cover opacity-50" />
         </div>
 
-        <div className="relative z-10 px-4">
+        <div className="relative z-10">
           <Header />
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/project/:id" element={<ProjectDetails />} />
             <Route path="/admin" element={<AdminPanel />} />
           </Routes>
-          <footer className="py-20 text-center opacity-30 text-[10px] tracking-[0.8em] uppercase border-t border-white/5">
+          <footer className="py-10 text-center opacity-30 text-[8px] md:text-[10px] tracking-[0.5em] md:tracking-[0.8em] uppercase border-t border-white/5">
             Zdravko Mijailović // 2026 // MD, PhD - AI
           </footer>
         </div>

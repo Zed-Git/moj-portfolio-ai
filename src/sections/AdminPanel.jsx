@@ -1,162 +1,182 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient'; 
-import { motion, AnimatePresence } from 'framer-motion'; 
-import { FaEdit, FaTrash, FaPlus, FaSignOutAlt, FaTimes } from 'react-icons/fa';
-import AdminAboutEditor from '../components/admin/AdminAboutEditor';
+import { motion } from 'framer-motion';
+import { FaEdit, FaUpload, FaSpinner, FaSignOutAlt, FaLock } from 'react-icons/fa';
 
 const AdminPanel = () => {
-  const [projekti, setProjekti] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [email, setEmail] = useState(''); // Dodali smo email polje
+  const [password, setPassword] = useState('');
+  const [session, setSession] = useState(null); // Prati da li si ulogovan
+  const [loading, setLoading] = useState(false);
   
-  const [newProject, setNewProject] = useState({
-    naslov: '', opis: '', tehnologija: '', slika_url: ''
+  // Drastično poboljšan State za projekte
+  const [projekti, setProjekti] = useState([]);
+  const [editingId, setEditingId] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [formData, setFormData] = useState({
+    naslov: '', opis: '', detaljan_tekst: '', tip_medija: 'slika', izvor_medija: '', tehnologija: ''
   });
 
+  // 1. PROVERA: Da li smo već ulogovani? (Vizita pri startu)
   useEffect(() => {
-    fetchProjekti();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
   }, []);
 
-  const fetchProjekti = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('projects')
-        .select('*')
-        .order('id', { ascending: false });
-      if (error) throw error;
-      setProjekti(data || []);
-    } catch (error) {
-      console.error('Greška:', error.message);
-    } finally {
-      setLoading(false);
-    }
+  const fetchProjects = async () => {
+    const { data } = await supabase.from('projects').select('*').order('id', { ascending: false });
+    if (data) setProjekti(data);
   };
 
-  const handleAddProject = async (e) => {
+  useEffect(() => {
+    if (session) fetchProjects();
+  }, [session]);
+
+  // 2. FUNKCIJA ZA PRAVI LOGIN
+  const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) alert("Greška pri prijavi: " + error.message);
+    setLoading(false);
+  };
+
+  // 3. FUNKCIJA ZA LOGOUT (Odjava)
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setSession(null);
+  };
+
+  // --- Funkcije za Upload i Submit ostaju iste kao ranije ---
+  const handleFileUpload = async (event) => {
     try {
-      const { error } = await supabase.from('projects').insert([newProject]);
-      if (error) throw error;
-      setNewProject({ naslov: '', opis: '', tehnologija: '', slika_url: '' });
-      setIsFormOpen(false);
-      fetchProjekti();
-      alert("Projekat uspešno dodat!");
+      setUploading(true);
+      const file = event.target.files[0];
+      if (!file) return;
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const { error: uploadError } = await supabase.storage.from('media').upload(fileName, file);
+      if (uploadError) throw uploadError;
+      const { data } = supabase.storage.from('media').getPublicUrl(fileName);
+      setFormData({ ...formData, izvor_medija: data.publicUrl });
+      alert("Fajl uskladišten!");
     } catch (error) {
-      alert("Greška: " + error.message);
+      alert(error.message);
+    } finally {
+      setUploading(false);
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Da li ste sigurni? Brisanje je trajno.")) {
-      try {
-        const { error } = await supabase.from('projects').delete().eq('id', id);
-        if (error) throw error;
-        setProjekti(projekti.filter(p => p.id !== id));
-      } catch (error) {
-        alert("Greška: " + error.message);
-      }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (editingId) {
+      await supabase.from('projects').update(formData).eq('id', editingId);
+    } else {
+      await supabase.from('projects').insert([formData]);
     }
+    setEditingId(null);
+    setFormData({ naslov: '', opis: '', detaljan_tekst: '', tip_medija: 'slika', izvor_medija: '', tehnologija: '' });
+    fetchProjects();
   };
 
-  if (loading) {
+  // --- EKRAN 1: LOGIN FORMA (Pristupna soba) ---
+  if (!session) {
     return (
-      <div className="min-h-screen bg-[#020617] flex items-center justify-center font-mono text-cyan-500 animate-pulse uppercase tracking-widest text-xs">
-        Synchronizing Medical Database...
+      <div className="min-h-screen flex items-center justify-center bg-[#03040b] px-4">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white/10 backdrop-blur-2xl p-10 rounded-[40px] border border-white/20 w-full max-w-md shadow-2xl"
+        >
+          <div className="flex justify-center mb-6">
+            <div className="w-16 h-16 bg-cyan-500/20 rounded-full flex items-center justify-center border border-cyan-500/30">
+              <FaLock className="text-cyan-400 text-2xl" />
+            </div>
+          </div>
+          <h2 className="text-white text-2xl font-black mb-8 text-center uppercase tracking-widest">Medical Auth</h2>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <input 
+              type="email" placeholder="Vaš Email" 
+              className="w-full p-4 bg-black/50 border border-white/10 rounded-2xl text-white outline-none focus:border-cyan-400"
+              onChange={(e) => setEmail(e.target.value)} required
+            />
+            <input 
+              type="password" placeholder="Lozinka" 
+              className="w-full p-4 bg-black/50 border border-white/10 rounded-2xl text-white outline-none focus:border-cyan-400"
+              onChange={(e) => setPassword(e.target.value)} required
+            />
+            <button disabled={loading} className="w-full bg-cyan-500 py-4 rounded-2xl font-black text-black hover:bg-cyan-400 transition-all uppercase tracking-widest flex justify-center items-center gap-2">
+              {loading ? <FaSpinner className="animate-spin" /> : 'Pristupi Dashboard-u'}
+            </button>
+          </form>
+        </motion.div>
       </div>
     );
   }
 
+  // --- EKRAN 2: DASHBOARD (Glavna ordinacija) ---
   return (
-    // REŠAVAMO 'motion' ERROR: Sada ga koristimo ovde!
-    <motion.div 
-      initial={{ opacity: 0 }} 
-      animate={{ opacity: 1 }}
-      className="min-h-screen bg-[#020617] text-white p-6 md:p-10 pt-32 font-sans relative z-10"
-    >
-      <header className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center mb-16 gap-6 border-b border-slate-800/50 pb-8">
-        <div>
-          <h1 className="text-3xl font-black bg-linear-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent tracking-tighter uppercase">
-            ZED ADMIN LAB
-          </h1>
-          <p className="text-slate-500 text-[10px] font-mono mt-1 uppercase tracking-widest">Precision Control Dashboard</p>
+    <div className="min-h-screen pt-40 pb-20 px-6 bg-[#03040b] text-white">
+      <div className="max-w-4xl mx-auto">
+        <div className="flex justify-between items-center mb-12">
+          <h1 className="text-3xl font-black text-cyan-400 uppercase tracking-widest">Admin Dashboard</h1>
+          <button onClick={handleLogout} className="flex items-center gap-2 text-red-400 hover:text-red-300 transition-all uppercase text-xs font-bold bg-red-500/10 px-4 py-2 rounded-full border border-red-500/20">
+            <FaSignOutAlt /> Odjavi se
+          </button>
         </div>
 
-        <button onClick={() => supabase.auth.signOut().then(() => window.location.reload())}
-          className="flex items-center gap-2 bg-slate-900 border border-slate-800 hover:border-red-500/50 hover:text-red-400 text-slate-400 px-6 py-2 rounded-full transition-all text-sm"
-        >
-          <FaSignOutAlt size={14} /> Odjavi se
-        </button>
-      </header>
-
-      <main className="max-w-6xl mx-auto space-y-24">
-        {/* ABOUT MANAGEMENT */}
-        <section>
-          <div className="flex items-center gap-4 mb-8">
-            <div className="h-px grow bg-slate-800"></div>
-            <h2 className="text-[10px] font-bold uppercase tracking-[0.3em] text-cyan-500">About Management</h2>
-            <div className="h-px grow bg-slate-800"></div>
-          </div>
-          <div className="bg-slate-900/20 border border-slate-800/50 p-8 rounded-4xl backdrop-blur-sm">
-             <AdminAboutEditor />
-          </div>
-        </section>
-
-        {/* PROJECTS MANAGEMENT */}
-        <section>
-          <div className="flex justify-between items-center mb-10">
-            <h2 className="text-[10px] font-bold uppercase tracking-[0.3em] text-blue-500">Project Repository</h2>
-            <button 
-              onClick={() => setIsFormOpen(!isFormOpen)}
-              className={`flex items-center gap-2 px-6 py-2 rounded-full font-bold text-sm transition-all ${isFormOpen ? 'bg-red-500/20 text-red-500 border border-red-500/50' : 'bg-cyan-600 hover:bg-cyan-500 text-white shadow-lg'}`}
-            >
-              {isFormOpen ? <><FaTimes /> Close</> : <><FaPlus /> New Project</>}
-            </button>
-          </div>
-
-          <AnimatePresence>
-            {isFormOpen && (
-              <motion.div 
-                initial={{ opacity: 0, height: 0 }} 
-                animate={{ opacity: 1, height: 'auto' }} 
-                exit={{ opacity: 0, height: 0 }}
-                className="overflow-hidden mb-16 bg-slate-900/40 border border-cyan-500/20 p-8 rounded-3xl"
-              >
-                <form onSubmit={handleAddProject} className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <input type="text" placeholder="Project Title" required className="bg-slate-950 p-4 rounded-xl border border-slate-800 outline-none focus:border-cyan-500 text-sm" value={newProject.naslov} onChange={(e) => setNewProject({...newProject, naslov: e.target.value})} />
-                  <input type="text" placeholder="Tech Stack (React, AI...)" className="bg-slate-950 p-4 rounded-xl border border-slate-800 outline-none focus:border-cyan-500 text-sm" value={newProject.tehnologija} onChange={(e) => setNewProject({...newProject, tehnologija: e.target.value})} />
-                  <textarea placeholder="Scientific Description" required rows="4" className="md:col-span-2 bg-slate-950 p-4 rounded-xl border border-slate-800 outline-none focus:border-cyan-500 text-sm" value={newProject.opis} onChange={(e) => setNewProject({...newProject, opis: e.target.value})} />
-                  <input type="text" placeholder="Image URL from Storage" className="md:col-span-2 bg-slate-950 p-4 rounded-xl border border-slate-800 outline-none focus:border-cyan-500 text-sm" value={newProject.slika_url} onChange={(e) => setNewProject({...newProject, slika_url: e.target.value})} />
-                  <button type="submit" className="md:col-span-2 bg-cyan-600 py-4 rounded-xl font-bold uppercase tracking-widest hover:bg-cyan-500 transition-all text-xs">Save to Database</button>
-                </form>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-20">
-            {projekti.map((proj) => (
-              <div key={proj.id} className="bg-slate-900/30 border border-slate-800/50 rounded-3xl overflow-hidden group hover:border-cyan-500/30 transition-all">
-                <div className="h-40 bg-slate-800 relative text-left">
-                  {proj.slika_url && <img src={proj.slika_url} alt="" className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-all duration-700" />}
-                  <div className="absolute top-3 left-3 bg-slate-950/80 px-2 py-1 rounded font-mono text-[9px] text-cyan-500 border border-cyan-500/20">ID: {proj.id}</div>
-                </div>
-                <div className="p-6 text-left">
-                  <h3 className="font-bold text-white text-sm uppercase mb-2 group-hover:text-cyan-400 transition-colors">{proj.naslov}</h3>
-                  <p className="text-slate-500 text-[11px] line-clamp-2 min-h-12 leading-relaxed mb-6">{proj.opis}</p>
-                  <div className="flex justify-between items-center pt-4 border-t border-slate-800/50">
-                    <span className="text-[9px] text-slate-600 font-mono italic uppercase">{proj.tehnologija || 'Scientific Data'}</span>
-                    <div className="flex gap-4">
-                      <FaEdit className="text-slate-500 hover:text-cyan-400 cursor-pointer" size={14} />
-                      <FaTrash onClick={() => handleDelete(proj.id)} className="text-slate-500 hover:text-red-500 cursor-pointer" size={14} />
-                    </div>
-                  </div>
-                </div>
+        {/* FORMA ZA UNOS/IZMENU (Ona lepa koju smo već napravili) */}
+        <div className="bg-white/5 backdrop-blur-3xl p-8 rounded-[40px] border border-white/10 shadow-2xl mb-12">
+           <form onSubmit={handleSubmit} className="space-y-4 text-black">
+              {/* Ovde idu sva tvoja polja (naslov, opis, upload...) ista kao ranije */}
+              <input type="text" placeholder="Naslov" className="w-full p-4 bg-white rounded-2xl" value={formData.naslov} onChange={(e) => setFormData({...formData, naslov: e.target.value})} required />
+              <input type="text" placeholder="Kratak opis" className="w-full p-4 bg-white rounded-2xl" value={formData.opis} onChange={(e) => setFormData({...formData, opis: e.target.value})} required />
+              <textarea placeholder="Stručni tekst" className="w-full p-4 bg-white rounded-2xl h-32" value={formData.detaljan_tekst} onChange={(e) => setFormData({...formData, detaljan_tekst: e.target.value})} required />
+              
+              <div className="grid grid-cols-2 gap-4">
+                <input type="text" placeholder="Tehnologije" className="p-4 bg-white rounded-2xl" value={formData.tehnologija} onChange={(e) => setFormData({...formData, tehnologija: e.target.value})} required />
+                <select className="p-4 bg-white rounded-2xl" value={formData.tip_medija} onChange={(e) => setFormData({...formData, tip_medija: e.target.value})}>
+                  <option value="slika">Slika</option>
+                  <option value="video">Video</option>
+                </select>
               </div>
-            ))}
-          </div>
-        </section>
-      </main>
-    </motion.div>
+
+              <div className="bg-cyan-500/5 border-2 border-dashed border-cyan-500/20 p-6 rounded-2xl text-center">
+                <input type="file" accept="image/*,video/*" onChange={handleFileUpload} disabled={uploading} className="text-xs text-white file:bg-cyan-500 file:border-none file:px-4 file:py-2 file:rounded-full cursor-pointer" />
+                {uploading && <p className="text-cyan-400 text-[10px] mt-2 animate-pulse">UČITAVANJE U MAGACIN...</p>}
+              </div>
+
+              <input type="text" placeholder="URL" className="w-full p-4 bg-white/10 text-white rounded-2xl" value={formData.izvor_medija} readOnly />
+              
+              <button type="submit" className="w-full bg-cyan-500 p-5 rounded-2xl font-black text-black hover:bg-cyan-400 transition-all uppercase">
+                {editingId ? 'Sačuvaj izmene' : 'Objavi novi rad'}
+              </button>
+           </form>
+        </div>
+
+        {/* LISTA PROJEKATA ZA IZMENU */}
+        <div className="space-y-4">
+          <h2 className="text-white/40 uppercase text-xs font-black tracking-widest ml-4">Lista tvojih radova</h2>
+          {projekti.map((p) => (
+            <div key={p.id} className="flex items-center justify-between bg-white/5 p-6 rounded-3xl border border-white/5 hover:border-cyan-500/20 transition-all group">
+              <span className="font-bold text-white group-hover:text-cyan-400 transition-colors">{p.naslov}</span>
+              <button onClick={() => { setEditingId(p.id); setFormData(p); window.scrollTo(0,0); }} className="p-3 bg-white/5 rounded-xl hover:bg-cyan-500 hover:text-black transition-all">
+                <FaEdit />
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 };
 

@@ -1,69 +1,83 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
+import ProjectDetails from './ProjectDetails';
 
 const Projects = () => {
-  const [projektiIzBaze, setProjektiIzBaze] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [projekti, setProjekti] = useState([]);
+  const [selectedProject, setSelectedProject] = useState(null);
 
   useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const { data, error } = await supabase.from('projects').select('*').order('id', { ascending: false });
-        if (error) throw error;
-        setProjektiIzBaze(data || []);
-      } catch (err) {
-        console.error("Greška:", err.message);
-      } finally {
-        setLoading(false);
-      }
+    const fetchProjekti = async () => {
+      const { data, error } = await supabase
+        .from('projects')
+        .select('*')
+        .order('id', { ascending: false });
+      
+      if (!error) setProjekti(data);
     };
-    fetchProjects();
+    fetchProjekti();
   }, []);
 
-  if (loading) return <div className="py-24 text-center text-cyan-500 animate-pulse uppercase tracking-widest text-[10px] font-black">Učitavanje...</div>;
-
   return (
-    <section id="projects" className="py-24 bg-black font-sans text-left">
-      <div className="max-w-7xl mx-auto px-6 text-left text-white">
-  <motion.h2 
-  initial={{ opacity: 0, y: 10 }} 
-  whileInView={{ opacity: 1, y: 0 }}
-  className="text-3xl font-bold mb-12"
->
-  AI <span className="text-cyan-500">Projects</span>
-</motion.h2>
+    <section id="projects" className="py-32 bg-[#020617] text-white">
+      <div className="max-w-7xl mx-auto px-6">
         
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10 text-left">
-          {projektiIzBaze.map((project, index) => (
+        {/* Animiran naslov - Da VS Code vidi da koristimo motion */}
+        <motion.div 
+          initial={{ opacity: 0, x: -20 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          className="mb-16"
+        >
+          <h2 className="text-4xl font-black tracking-tighter uppercase italic">
+            AI <span className="text-cyan-500">Projects</span>
+          </h2>
+          <div className="h-1 w-20 bg-cyan-500 mt-2"></div>
+        </motion.div>
+
+        {/* Grid sa projektima */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+          {projekti.map((project, index) => (
             <motion.div
               key={project.id}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className="group relative bg-white/5 rounded-[40px] overflow-hidden border border-white/10 hover:border-cyan-500/50 transition-all duration-700 text-left"
+              viewport={{ once: true }}
+              className="group cursor-pointer"
+              onClick={() => setSelectedProject(project)}
             >
-              <Link to={`/project/${project.id}`}>
-                <div className="aspect-video overflow-hidden bg-slate-900 text-left">
-                  {project.slika_url ? (
-                    <img src={project.slika_url} alt={project.naslov} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 text-left" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-slate-700 uppercase text-[10px] tracking-widest italic text-left">No image record</div>
-                  )}
+              <div className="relative overflow-hidden rounded-2xl bg-slate-900 border border-slate-800 transition-all group-hover:border-cyan-500/50">
+                <div className="h-64 overflow-hidden">
+                  <img 
+                    src={project.slika_url} 
+                    alt="" 
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-70 group-hover:opacity-100"
+                  />
                 </div>
-                <div className="p-10 text-left">
-                  <h3 className="text-xl font-bold text-white mb-4 uppercase tracking-tight text-left leading-tight">{project.naslov}</h3>
-                  <p className="text-slate-400 text-sm font-light leading-relaxed line-clamp-3 text-left">{project.opis}</p>
-                  <div className="mt-6 text-[10px] font-black text-cyan-400 uppercase tracking-widest opacity-60 group-hover:opacity-100 transition-all text-left">
-                     View Research Detail +
-                  </div>
+                <div className="p-6 text-left">
+                  <h3 className="text-lg font-bold uppercase mb-2">{project.naslov}</h3>
+                  <p className="text-slate-500 text-xs line-clamp-2 mb-4 leading-relaxed">
+                    {project.opis}
+                  </p>
+                  <span className="text-[10px] font-mono text-cyan-500 uppercase tracking-widest">
+                    View Research Detail +
+                  </span>
                 </div>
-              </Link>
+              </div>
             </motion.div>
           ))}
         </div>
       </div>
+
+      {/* Modal za detalje */}
+      {selectedProject && (
+        <ProjectDetails 
+          project={selectedProject} 
+          onClose={() => setSelectedProject(null)} 
+        />
+      )}
     </section>
   );
 };

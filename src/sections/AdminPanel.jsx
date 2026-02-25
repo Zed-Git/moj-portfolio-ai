@@ -61,28 +61,23 @@ const AdminPanel = () => {
 
   if (loading) {
     return (
-      <motion.div 
-        initial={{ opacity: 0 }} 
-        animate={{ opacity: 1 }}
-        className="min-h-screen bg-[#020617] flex items-center justify-center"
-      >
-        <div className="text-cyan-500 font-mono animate-pulse tracking-widest uppercase text-xs">
-          Synchronizing Medical Database...
-        </div>
-      </motion.div>
+      <div className="min-h-screen bg-[#020617] flex items-center justify-center font-mono text-cyan-500 animate-pulse uppercase tracking-widest text-xs">
+        Synchronizing Medical Database...
+      </div>
     );
   }
 
   return (
+    // REŠAVAMO 'motion' ERROR: Sada ga koristimo ovde!
     <motion.div 
-      initial={{ opacity: 0, y: 10 }} 
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0 }} 
+      animate={{ opacity: 1 }}
       className="min-h-screen bg-[#020617] text-white p-6 md:p-10 pt-32 font-sans relative z-10"
     >
       <header className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center mb-16 gap-6 border-b border-slate-800/50 pb-8">
         <div>
           <h1 className="text-3xl font-black bg-linear-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent tracking-tighter uppercase">
-            Admin Lab
+            ZED ADMIN LAB
           </h1>
           <p className="text-slate-500 text-[10px] font-mono mt-1 uppercase tracking-widest">Precision Control Dashboard</p>
         </div>
@@ -95,6 +90,7 @@ const AdminPanel = () => {
       </header>
 
       <main className="max-w-6xl mx-auto space-y-24">
+        {/* ABOUT MANAGEMENT */}
         <section>
           <div className="flex items-center gap-4 mb-8">
             <div className="h-px grow bg-slate-800"></div>
@@ -106,6 +102,7 @@ const AdminPanel = () => {
           </div>
         </section>
 
+        {/* PROJECTS MANAGEMENT */}
         <section>
           <div className="flex justify-between items-center mb-10">
             <h2 className="text-[10px] font-bold uppercase tracking-[0.3em] text-blue-500">Project Repository</h2>
@@ -139,7 +136,7 @@ const AdminPanel = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-20">
             {projekti.map((proj) => (
               <div key={proj.id} className="bg-slate-900/30 border border-slate-800/50 rounded-3xl overflow-hidden group hover:border-cyan-500/30 transition-all">
-                <div className="h-40 bg-slate-800 relative">
+                <div className="h-40 bg-slate-800 relative text-left">
                   {proj.slika_url && <img src={proj.slika_url} alt="" className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-all duration-700" />}
                   <div className="absolute top-3 left-3 bg-slate-950/80 px-2 py-1 rounded font-mono text-[9px] text-cyan-500 border border-cyan-500/20">ID: {proj.id}</div>
                 </div>
@@ -147,10 +144,10 @@ const AdminPanel = () => {
                   <h3 className="font-bold text-white text-sm uppercase mb-2 group-hover:text-cyan-400 transition-colors">{proj.naslov}</h3>
                   <p className="text-slate-500 text-[11px] line-clamp-2 min-h-12 leading-relaxed mb-6">{proj.opis}</p>
                   <div className="flex justify-between items-center pt-4 border-t border-slate-800/50">
-                    <span className="text-[9px] text-slate-600 font-mono italic">{proj.tehnologija || 'Scientific Data'}</span>
+                    <span className="text-[9px] text-slate-600 font-mono italic uppercase">{proj.tehnologija || 'Scientific Data'}</span>
                     <div className="flex gap-4">
-                      <FaEdit className="text-slate-500 hover:text-cyan-400 cursor-pointer transition-colors" size={14} />
-                      <FaTrash onClick={() => handleDelete(proj.id)} className="text-slate-500 hover:text-red-500 cursor-pointer transition-colors" size={14} />
+                      <FaEdit className="text-slate-500 hover:text-cyan-400 cursor-pointer" size={14} />
+                      <FaTrash onClick={() => handleDelete(proj.id)} className="text-slate-500 hover:text-red-500 cursor-pointer" size={14} />
                     </div>
                   </div>
                 </div>

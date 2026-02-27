@@ -1,66 +1,46 @@
-import React, { useState } from 'react';
-// eslint-disable-next-line
-import { motion, AnimatePresence } from 'framer-motion';
-import { FaEnvelope, FaCheckCircle, FaSpinner } from 'react-icons/fa';
+import React from 'react';
+import { FaEnvelope, FaPaperPlane, FaCloudUploadAlt, FaInfoCircle } from 'react-icons/fa';
 
 const Contact = () => {
-  const [status, setStatus] = useState("IDLE");
-  
-  const handleFormSubmit = async (e) => {
-    e.preventDefault();
-    setStatus("SENDING");
-    const formData = new FormData(e.target);
-    const response = await fetch("https://formspree.io/f/mojnpqje", {
-      method: "POST",
-      body: formData,
-      headers: { 'Accept': 'application/json' }
-    });
-    if (response.ok) { setStatus("SUCCESS"); e.target.reset(); } 
-    else { setStatus("ERROR"); }
-  };
-
   return (
-    <section id="contact" className="py-32 px-6">
-      <div className="max-w-6xl mx-auto">
-        {/* OVDE KORISTIMO motion.div - VSC vidi da se koristi i broj 1 nestaje! */}
-        <motion.div 
-          initial={{ opacity: 0 }} 
-          whileInView={{ opacity: 1 }} 
-          viewport={{ once: true }} 
-          className="text-center mb-20"
-        >
-          <h2 className="text-4xl md:text-5xl font-black text-white uppercase tracking-[0.2em] mb-4 text-center">Contact</h2>
-          <div className="w-20 h-1 bg-cyan-500 mx-auto rounded-full shadow-[0_0_15px_rgba(34,211,238,0.8)]"></div>
-        </motion.div>
+    <section id="contact" className="py-32 bg-black text-white">
+      <div className="max-w-4xl mx-auto px-6 text-center">
+        <h2 className="text-4xl font-black uppercase italic mb-4 tracking-tighter">Get in <span className="text-cyan-500">Touch</span></h2>
+        <p className="text-slate-500 mb-16 uppercase text-xs tracking-[0.3em]">For scientific collaboration and AI inquiries</p>
 
-        <div className="grid lg:grid-cols-2 gap-16 text-left">
-          <div className="space-y-8 text-white font-light">
-            <h3 className="text-2xl font-bold">Let's explore the future of healthcare together</h3>
-            <p className="text-blue-100/60 leading-relaxed italic">"Whether you're looking to collaborate on AI initiatives or exchange scientific expertise, feel free to get in touch."</p>
+        <form className="space-y-6 text-left">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <input type="text" placeholder="Full Name" className="w-full bg-[#0f172a] border border-slate-800 p-5 rounded-2xl outline-none focus:border-cyan-500 transition-all font-bold" />
+            <input type="email" placeholder="Medical / Org Email" className="w-full bg-[#0f172a] border border-slate-800 p-5 rounded-2xl outline-none focus:border-cyan-500 transition-all font-bold" />
+          </div>
+          <textarea rows="6" placeholder="Your Inquiry / Collaboration proposal..." className="w-full bg-[#0f172a] border border-slate-800 p-5 rounded-2xl outline-none focus:border-cyan-500 transition-all font-bold"></textarea>
+
+          {/* VIZUELNI UPLOAD ZA KONTAKT */}
+          <div className="bg-[#0f172a] border border-slate-800 p-8 rounded-3xl border-dashed border-cyan-500/20">
+            <div className="flex flex-col items-center gap-4">
+              <FaCloudUploadAlt size={30} className="text-slate-600" />
+              <div className="text-center">
+                <p className="text-sm font-bold text-white mb-1 uppercase tracking-widest">Scientific Attachments</p>
+                <div className="flex items-center gap-2 bg-blue-500/5 p-3 rounded-lg border border-blue-500/10">
+                  <FaInfoCircle className="text-blue-400 text-xs" />
+                  <p className="text-[10px] text-blue-300 font-bold uppercase tracking-tighter">
+                    NOTE: Please send large datasets, images or MP4 videos directly to my email as attachments.
+                  </p>
+                </div>
+              </div>
+              <a href="mailto:your-email@medexnews.com" className="bg-white/5 border border-white/10 px-6 py-2 rounded-full text-[10px] font-black uppercase hover:bg-white/10 transition-all">
+                Open Email Client
+              </a>
+            </div>
           </div>
 
-          <div className="bg-white/3 backdrop-blur-3xl border border-white/10 p-8 md:p-12 rounded-[40px] shadow-2xl relative overflow-hidden text-white">
-            <AnimatePresence mode="wait">
-              {status === "SUCCESS" ? (
-                <motion.div key="success" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="py-20 text-center space-y-6">
-                  <FaCheckCircle className="text-cyan-400 text-6xl mx-auto animate-bounce" />
-                  <h3 className="text-2xl font-black uppercase">Message Received!</h3>
-                </motion.div>
-              ) : (
-                <form onSubmit={handleFormSubmit} className="space-y-6">
-                  <input name="name" type="text" placeholder="Name" className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white outline-none focus:border-cyan-500/50" required />
-                  <input name="email" type="email" placeholder="Email" className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white outline-none focus:border-cyan-500/50" required />
-                  <textarea name="message" rows="5" placeholder="Message..." className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white outline-none resize-none focus:border-cyan-500/50" required></textarea>
-                  <button type="submit" disabled={status === "SENDING"} className="w-full bg-cyan-500 text-black font-black py-5 rounded-2xl uppercase tracking-widest hover:bg-cyan-400 transition-all flex justify-center items-center gap-3 cursor-pointer">
-                    {status === "SENDING" ? <FaSpinner className="animate-spin" /> : "Send Message"}
-                  </button>
-                </form>
-              )}
-            </AnimatePresence>
-          </div>
-        </div>
+          <button type="submit" className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-black py-5 rounded-2xl transition-all uppercase tracking-widest shadow-xl shadow-cyan-900/20 flex items-center justify-center gap-3">
+            <FaPaperPlane /> Send Message
+          </button>
+        </form>
       </div>
     </section>
   );
 };
+
 export default Contact;

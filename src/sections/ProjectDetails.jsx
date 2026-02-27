@@ -44,7 +44,7 @@ const ProjectDetails = ({ project, onClose }) => {
             onClick={onClose}
             className="bg-white text-black font-bold px-8 py-3 rounded-full hover:bg-cyan-500 hover:text-white transition-all uppercase text-sm"
           >
-            Zatvori detalje
+            CLOSE DETAILS
           </button>
         </div>
       </motion.div>

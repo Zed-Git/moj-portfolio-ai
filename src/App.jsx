@@ -9,26 +9,27 @@ import ProjectDetails from './sections/ProjectDetails';
 import AdminPanel from './sections/AdminPanel'; 
 import bgFlare from './assets/bg-flare.jpg';
 import medicalLogo from './assets/medical-logo.jpg';
-// 1. UVOZIMO TVOJU SLIKU (Proveri da li je putanja tačna)
 import zdravkoImg from './assets/zdravko1.jpg';
 
 const Home = () => (
-  <main className="max-w-6xl mx-auto pt-32 md:pt-48 pb-32 px-4 md:px-0">
-    <motion.div 
-      // 2. KORISTIMO MOTION ZA ULAZNU ANIMACIJU (Čisti Problems u VSC)
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.8 }}
-      className="bg-[#03040b]/60 backdrop-blur-3xl border border-white/10 p-8 md:p-20 rounded-[40px] md:rounded-[100px] shadow-2xl text-center relative overflow-hidden"
-    >
-      {/* POZADINSKI SLOJ SA LOGOTIPOM */}
+  /* 1. Ovde koristimo 'motion.main' umesto običnog 'main'. 
+     Ovim "zapošljavamo" motion alat i rešavamo VS Code warning. */
+  <motion.main 
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    transition={{ duration: 0.8 }}
+    className="max-w-6xl mx-auto pt-32 md:pt-48 pb-32 px-4 md:px-0"
+  >
+    <div className="bg-[#03040b]/60 backdrop-blur-3xl border border-white/10 p-8 md:p-20 rounded-[40px] md:rounded-[100px] shadow-2xl text-center relative overflow-hidden">
+      
+      {/* POZADINSKI SLOJ */}
       <div className="absolute inset-0 z-0">
         <img src={medicalLogo} alt="" className="w-full h-full object-cover opacity-10" />
         <div className="absolute inset-0 bg-linear-to-b from-transparent to-[#03040b]"></div>
       </div>
 
       <div className="relative z-10 flex flex-col items-center">
-        {/* 3. TVOJA PORTRETNA SLIKA SA AI EFEKTOM */}
+        {/* TVOJA SLIKA SA ANIMACIJOM */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -47,42 +48,41 @@ const Home = () => (
           AI + Health-Tech Precision
         </div>
 
-        {/* 4. GLAVNI NASLOV - TVOJA TITULA */}
+        {/* TITULA - Dodao sam FACC i ARDMS prema tvom screenshotu */}
         <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white tracking-tighter leading-tight mb-8 drop-shadow-2xl">
           Z. Mijailovic <br />
           <span className="text-transparent bg-clip-text bg-linear-to-tr from-blue-400 via-white to-cyan-300">
-            MD, PhD, FACC, ARDMS, Cardiologist - AI
+            MD, PhD, FACC, ARDMS, <br className="hidden md:block" /> Cardiologist - AI
           </span>
         </h1>
 
-        {/* 5. TVOJA MISIJA / MOTO */}
         <p className="text-lg md:text-xl text-blue-100/80 max-w-3xl mx-auto mb-12 font-light leading-relaxed italic">
           "I believe that <span className="text-white font-medium italic underline decoration-cyan-500/50 underline-offset-4">Medicine must evolve</span> from being merely an individual craft or skill into a rigorous science."
         </p>
 
-        {/* KOMANDE (BUTTONS) */}
         <div className="flex flex-col sm:flex-row gap-5 md:gap-8 justify-center items-center w-full">
-          <a href="#projects" className="w-full sm:w-auto bg-white text-black px-12 py-5 rounded-2xl font-black text-sm tracking-widest hover:bg-cyan-400 transition-all uppercase shadow-xl">
+          <a href="#projects" className="w-full sm:w-auto bg-white text-black px-12 py-5 rounded-2xl font-black text-sm tracking-widest hover:bg-cyan-400 transition-all uppercase shadow-xl text-center">
             Projects
           </a>
-          <a href="#contact" className="w-full sm:w-auto bg-white/5 text-white border border-white/10 px-12 py-5 rounded-2xl font-black text-sm tracking-widest hover:bg-white/10 transition-all uppercase">
+          <a href="#contact" className="w-full sm:w-auto bg-white/5 text-white border border-white/10 px-12 py-5 rounded-2xl font-black text-sm tracking-widest hover:bg-white/10 transition-all uppercase text-center">
             Contact
           </a>
         </div>
       </div>
-    </motion.div>
+    </div>
 
-    {/* OSTATAK SEKCIJA */}
+    {/* Pozivamo ostale sekcije */}
     <About />
     <Projects />
     <Contact />
-  </main>
+  </motion.main>
 );
 
 function App() {
   return (
     <Router>
       <div id="home" className="relative min-h-screen w-full bg-[#03040b] text-white overflow-x-hidden font-sans">
+        {/* Pozadinski efekat preko celog ekrana */}
         <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
           <img src={bgFlare} alt="" className="w-full h-full object-cover opacity-60" />
         </div>
@@ -95,7 +95,7 @@ function App() {
             <Route path="/admin" element={<AdminPanel />} />
           </Routes>
           <footer className="py-16 text-center opacity-30 text-[9px] tracking-[0.6em] uppercase border-t border-white/5">
-            Z. Mijailović // 2026 // MD, PhD - AI
+            Z. Mijailović // 2026 // MD, PhD, FACC, ARDMS - AI
           </footer>
         </div>
       </div>

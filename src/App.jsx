@@ -10,7 +10,7 @@ import ProjectDetails from './sections/ProjectDetails';
 import AdminPanel from './sections/AdminPanel'; 
 import bgFlare from './assets/bg-flare.jpg';
 import medicalLogo from './assets/medical-logo.jpg';
-import zdravkoImg from './assets/zdravko1.jpg';
+import zdravkoImg from './assets/zdravko1.webp';
 
 const Home = () => (
   /* 1. Ovde koristimo 'motion.main' umesto običnog 'main'. 

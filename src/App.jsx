@@ -11,21 +11,20 @@ import bgFlare from './assets/bg-flare.jpg';
 import medicalLogo from './assets/medical-logo.jpg';
 
 const Home = () => (
-  <main className="max-w-6xl mx-auto pt-32 md:pt-60 pb-32 px-4 md:px-0">
-    <motion.div 
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 1 }}
-      className="bg-[#03040b]/40 backdrop-blur-2xl border border-white/10 p-8 md:p-24 rounded-[40px] md:rounded-[80px] shadow-2xl text-center relative overflow-hidden"
-    >
-      {/* POZADINSKA SLIKA - RESTORED */}
+  <motion.main 
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    transition={{ duration: 0.8 }}
+    className="max-w-6xl mx-auto pt-32 md:pt-60 pb-32 px-4 md:px-0"
+  >
+    <div className="bg-[#03040b]/40 backdrop-blur-2xl border border-white/10 p-8 md:p-24 rounded-[40px] md:rounded-[80px] shadow-2xl text-center relative overflow-hidden">
       <div className="absolute inset-0 z-0">
         <img src={medicalLogo} alt="Medical AI" className="w-full h-full object-cover opacity-20" />
         <div className="absolute inset-0 bg-linear-to-b from-[#03040b]/10 via-transparent to-[#03040b]/80"></div>
       </div>
 
       <div className="relative z-10">
-        <div className="inline-block px-4 py-1.5 mb-6 md:mb-10 text-[9px] md:text-[11px] font-black tracking-[0.4em] text-cyan-400 uppercase border border-cyan-400/20 rounded-full bg-cyan-400/10">
+        <div className="inline-block px-4 py-1.5 mb-6 md:mb-10 text-[9px] md:text-[11px] font-black tracking-[0.3em] text-cyan-400 uppercase border border-cyan-400/20 rounded-full bg-cyan-400/10">
           AI + Health-Tech Precision
         </div>
 
@@ -41,16 +40,16 @@ const Home = () => (
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 md:gap-8 justify-center items-center">
-          <a href="#projects" className="w-full sm:w-auto bg-white text-black px-10 py-4 rounded-2xl font-black text-xs tracking-widest hover:bg-cyan-400 transition-all uppercase text-center">Projects</a>
-          <a href="#contact" className="w-full sm:w-auto bg-white/5 text-white border border-white/10 px-10 py-4 rounded-2xl font-black text-xs tracking-widest hover:bg-white/20 transition-all uppercase text-center">Contact</a>
+          <a href="#projects" className="w-full sm:w-auto bg-white text-black px-10 py-4 rounded-2xl font-black text-xs tracking-widest hover:bg-cyan-400 transition-all uppercase text-center">Projekti</a>
+          <a href="#contact" className="w-full sm:w-auto bg-white/5 text-white border border-white/10 px-10 py-4 rounded-2xl font-black text-xs tracking-widest hover:bg-white/20 transition-all uppercase text-center">Kontakt</a>
         </div>
       </div>
-    </motion.div>
+    </div>
 
     <About />
     <Projects />
     <Contact />
-  </main>
+  </motion.main>
 );
 
 function App() {

@@ -1,31 +1,26 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaEnvelope, FaPaperPlane, FaCloudUploadAlt, FaInfoCircle, FaCheckCircle } from 'react-icons/fa';
+import { FaEnvelope, FaPaperPlane, FaCloudUploadAlt, FaCheckCircle } from 'react-icons/fa';
 
 const Contact = () => {
   const myEmail = "mdzdravko@gmail.com";
-  // Stanje koje prati da li je poruka poslata
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSending, setIsSending] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSending(true);
-
     const formData = new FormData(e.target);
-    
     try {
       const response = await fetch(`https://formsubmit.co/ajax/${myEmail}`, {
         method: "POST",
         body: formData
       });
-
       if (response.ok) {
         setIsSubmitted(true);
-      } else {
-        alert("System error. Please try again.");
       }
     } catch (error) {
+      console.error("Submission error:", error);
       alert("Connection error.");
     } finally {
       setIsSending(false);
@@ -42,15 +37,14 @@ const Contact = () => {
           Scientific collaboration & AI research inquiries
         </p>
 
-        <div className="min-h-[400px] flex items-center justify-center">
+        <div className="min-h-100 flex items-center justify-center">
           <AnimatePresence mode="wait">
             {!isSubmitted ? (
-              // --- PRIKAZ FORME (DOK NIJE POSLATO) ---
               <motion.form 
                 key="contact-form"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
+                exit={{ opacity: 0 }}
                 onSubmit={handleSubmit}
                 className="space-y-6 text-left w-full"
               >
@@ -70,7 +64,8 @@ const Contact = () => {
                   <textarea name="message" rows="5" placeholder="Research proposal..." required className="w-full bg-[#0f172a] border border-slate-800 p-5 rounded-2xl outline-none focus:border-cyan-500 transition-all font-bold text-sm"></textarea>
                 </div>
 
-                <div className="bg-[#0f172a] border border-slate-800 p-8 rounded-3xl border-dashed border-cyan-500/20 text-center">
+                {/* SREĐEN BORDER: Izbačen border-slate-800 da ne bi bilo konflikta sa cyan */}
+                <div className="bg-[#0f172a] border border-dashed border-cyan-500/20 p-8 rounded-3xl text-center">
                   <FaCloudUploadAlt size={30} className="mx-auto text-slate-600 mb-4" />
                   <p className="text-[10px] text-blue-300 font-bold uppercase tracking-widest mb-4">
                     NOTE: Large datasets/images should be sent via Email Client.
@@ -89,26 +84,15 @@ const Contact = () => {
                 </button>
               </motion.form>
             ) : (
-              // --- PRIKAZ USPEHA (NAKON SLANJA) ---
               <motion.div 
-                key="success-message"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="text-center bg-[#0f172a] border border-cyan-500/30 p-16 rounded-[3rem] shadow-2xl"
+                key="success"
+                initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
+                className="text-center bg-[#0f172a] border border-cyan-500/30 p-16 rounded-4xl shadow-2xl"
               >
-                <div className="inline-flex p-5 bg-cyan-500/10 rounded-full mb-6 text-cyan-400">
-                  <FaCheckCircle size={50} />
-                </div>
-                <h3 className="text-2xl font-black text-white uppercase tracking-tighter mb-4">Message Received</h3>
-                <p className="text-slate-400 text-sm leading-relaxed max-w-xs mx-auto font-light">
-                  Your inquiry has been successfully transmitted to our scientific database. I will get back to you shortly.
-                </p>
-                <button 
-                  onClick={() => setIsSubmitted(false)}
-                  className="mt-10 text-[10px] text-cyan-500 font-black uppercase tracking-[0.3em] hover:text-white transition-colors"
-                >
-                  ← Send another one
-                </button>
+                <FaCheckCircle size={50} className="mx-auto text-cyan-400 mb-6" />
+                <h3 className="text-2xl font-black text-white uppercase mb-4">Message Received</h3>
+                <p className="text-slate-400 text-sm max-w-xs mx-auto">Your inquiry has been successfully transmitted.</p>
+                <button onClick={() => setIsSubmitted(false)} className="mt-10 text-[10px] text-cyan-500 font-black uppercase tracking-widest hover:text-white transition-colors">← Send another</button>
               </motion.div>
             )}
           </AnimatePresence>
@@ -119,4 +103,3 @@ const Contact = () => {
 };
 
 export default Contact;
-

@@ -30,7 +30,7 @@ const Home = () => (
         <h1 className="text-4xl md:text-7xl lg:text-9xl font-black text-white tracking-tighter leading-tight md:leading-[0.85] mb-8 md:mb-10 drop-shadow-2xl">
           Z. Mijailovic <br className="hidden md:block" />
           <span className="text-transparent bg-clip-text bg-linear-to-tr from-blue-400 via-white to-cyan-300">
-            MD, PhD - AI
+            MD, PhD, Cardiologist - AI
           </span>
         </h1>
 
@@ -39,8 +39,8 @@ const Home = () => (
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 md:gap-8 justify-center items-center">
-          <a href="#projects" className="w-full sm:w-auto bg-white text-black px-10 py-4 rounded-2xl font-black text-xs tracking-widest hover:bg-cyan-400 transition-all uppercase text-center">Projekti</a>
-          <a href="#contact" className="w-full sm:w-auto bg-white/5 text-white border border-white/10 px-10 py-4 rounded-2xl font-black text-xs tracking-widest hover:bg-white/20 transition-all uppercase text-center">Kontakt</a>
+          <a href="#projects" className="w-full sm:w-auto bg-white text-black px-10 py-4 rounded-2xl font-black text-xs tracking-widest hover:bg-cyan-400 transition-all uppercase text-center">Projects</a>
+          <a href="#contact" className="w-full sm:w-auto bg-white/5 text-white border border-white/10 px-10 py-4 rounded-2xl font-black text-xs tracking-widest hover:bg-white/20 transition-all uppercase text-center">Contact</a>
         </div>
       </div>
     </div>

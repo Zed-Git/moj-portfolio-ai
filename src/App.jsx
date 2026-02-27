@@ -18,14 +18,14 @@ const Home = () => (
       transition={{ duration: 1 }}
       className="bg-[#03040b]/40 backdrop-blur-2xl border border-white/10 p-8 md:p-24 rounded-[40px] md:rounded-[80px] shadow-2xl text-center relative overflow-hidden"
     >
-      {/* POZADINSKA SLIKA - VRAĆENA */}
+      {/* POZADINSKA SLIKA - RESTORED */}
       <div className="absolute inset-0 z-0">
         <img src={medicalLogo} alt="Medical AI" className="w-full h-full object-cover opacity-20" />
         <div className="absolute inset-0 bg-linear-to-b from-[#03040b]/10 via-transparent to-[#03040b]/80"></div>
       </div>
 
       <div className="relative z-10">
-        <div className="inline-block px-4 py-1.5 mb-6 md:mb-10 text-[9px] md:text-[11px] font-black tracking-[0.3em] text-cyan-400 uppercase border border-cyan-400/20 rounded-full bg-cyan-400/10">
+        <div className="inline-block px-4 py-1.5 mb-6 md:mb-10 text-[9px] md:text-[11px] font-black tracking-[0.4em] text-cyan-400 uppercase border border-cyan-400/20 rounded-full bg-cyan-400/10">
           AI + Health-Tech Precision
         </div>
 

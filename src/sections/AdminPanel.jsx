@@ -1,85 +1,161 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { supabase } from '../supabaseClient';
-import ProjectDetails from './ProjectDetails';
+import { supabase } from '../supabaseClient'; 
+import { motion, AnimatePresence } from 'framer-motion'; 
+import { FaTrash, FaSignOutAlt, FaCloudUploadAlt, FaLock, FaInfoCircle, FaEdit } from 'react-icons/fa';
+import AdminAboutEditor from '../components/admin/AdminAboutEditor';
 
-const Projects = () => {
+const AdminPanel = () => {
+  const [session, setSession] = useState(null);
   const [projekti, setProjekti] = useState([]);
-  const [selectedProject, setSelectedProject] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  
+  const [newProject, setNewProject] = useState({
+    naslov: '', opis: '', tehnologija: '', slika_url: '', media_type: 'Slika'
+  });
 
   useEffect(() => {
-    const fetchProjekti = async () => {
-      const { data, error } = await supabase
-        .from('projects')
-        .select('*')
-        .order('id', { ascending: false });
-      
-      if (!error) setProjekti(data);
-    };
-    fetchProjekti();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (session) fetchProjekti();
+      setLoading(false);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      if (session) fetchProjekti();
+    });
+    return () => subscription.unsubscribe();
   }, []);
 
+  const fetchProjekti = async () => {
+    const { data, error } = await supabase.from('projects').select('*').order('id', { ascending: false });
+    if (!error) setProjekti(data || []);
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) alert("Greška: " + error.message);
+  };
+
+  const handleFileUpload = async (event) => {
+    try {
+      setUploading(true);
+      const file = event.target.files[0];
+      if (!file) return;
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const { error: uploadError } = await supabase.storage.from('projects').upload(fileName, file);
+      if (uploadError) throw uploadError;
+      const { data } = supabase.storage.from('projects').getPublicUrl(fileName);
+      setNewProject({ ...newProject, slika_url: data.publicUrl });
+      alert("Fajl je uspešno ubačen u bazu!");
+    } catch (error) {
+      alert("Greška pri prenosu: " + error.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleAddProject = async (e) => {
+    e.preventDefault();
+    try {
+      // HIRURŠKI REZ: Izbacujemo media_type pre slanja u bazu jer kolona ne postoji
+      const { media_type, ...dataToInsert } = newProject;
+      const { error } = await supabase.from('projects').insert([dataToInsert]);
+      if (error) throw error;
+      setNewProject({ naslov: '', opis: '', tehnologija: '', slika_url: '', media_type: 'Slika' });
+      fetchProjekti();
+      alert("Rad je uspešno objavljen!");
+    } catch (error) {
+      alert("Greška: " + error.message);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Brisanje je trajno?")) {
+      await supabase.from('projects').delete().eq('id', id);
+      fetchProjekti();
+    }
+  };
+
+  if (loading) return <div className="min-h-screen bg-[#020617] flex items-center justify-center text-cyan-500 font-mono animate-pulse">AUTHENTICATING...</div>;
+
   return (
-    <section id="projects" className="py-24 md:py-32 bg-[#020617] text-white">
-      <div className="max-w-7xl mx-auto px-6">
-        
-        <motion.div 
-          initial={{ opacity: 0, x: -20 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          className="mb-16"
-        >
-          <h2 className="text-3xl md:text-4xl font-black tracking-tighter uppercase italic">
-            AI <span className="text-cyan-500">Projects</span>
-          </h2>
-          <div className="h-1 w-20 bg-cyan-500 mt-2"></div>
+    <AnimatePresence mode="wait">
+      {!session ? (
+        <motion.div key="login" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-screen bg-[#020617] flex items-center justify-center p-6">
+          <div className="bg-[#0f172a] border border-slate-800 p-10 rounded-4xl w-full max-w-md text-center shadow-2xl">
+            <FaLock size={40} className="mx-auto text-cyan-500 mb-6" />
+            <h2 className="text-2xl font-black text-white uppercase mb-8 tracking-tighter italic">Medical Auth</h2>
+            <form onSubmit={handleLogin} className="space-y-4">
+              <input type="email" placeholder="Email" className="w-full bg-[#1e293b] text-white p-4 rounded-xl outline-none" value={email} onChange={(e) => setEmail(e.target.value)} />
+              <input type="password" placeholder="Lozinka" className="w-full bg-[#1e293b] text-white p-4 rounded-xl outline-none" value={password} onChange={(e) => setPassword(e.target.value)} />
+              <button className="w-full bg-cyan-500 py-4 rounded-xl font-black uppercase text-black">Login</button>
+            </form>
+          </div>
         </motion.div>
+      ) : (
+        <motion.div key="dashboard" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-screen bg-[#020617] text-white p-4 md:p-10 pt-32">
+          <div className="max-w-5xl mx-auto">
+            
+            <header className="flex justify-between items-center mb-10">
+              <h1 className="text-3xl font-black text-cyan-500 uppercase italic">Admin Dashboard</h1>
+              <button onClick={() => supabase.auth.signOut()} className="bg-red-500/10 text-red-500 border border-red-500/20 px-4 py-2 rounded-lg text-[10px] font-black uppercase">Logout</button>
+            </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-          {projekti.map((project, index) => (
-            <motion.div
-              key={project.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              viewport={{ once: true }}
-              className="group cursor-pointer"
-              onClick={() => setSelectedProject(project)}
-            >
-              <div className="relative overflow-hidden rounded-2xl bg-slate-900 border border-slate-800 transition-all group-hover:border-cyan-500/50">
-                <div className="h-64 overflow-hidden">
-                  <img 
-                    src={project.slika_url} 
-                    alt={project.naslov} 
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-70 group-hover:opacity-100"
-                  />
-                </div>
-                {/* VRAĆEN TEKST I LINKOVI */}
-                <div className="p-6 text-left">
-                  <h3 className="text-lg font-bold uppercase mb-2 text-white group-hover:text-cyan-400 transition-colors">
-                    {project.naslov}
-                  </h3>
-                  <p className="text-slate-500 text-xs line-clamp-2 mb-4 leading-relaxed">
-                    {project.opis}
+            {/* FORMA ZA DODAVANJE (RESTORED) */}
+            <div className="bg-[#0f172a] border border-slate-800 p-6 md:p-10 rounded-[2.5rem] shadow-2xl mb-20 text-black">
+              <form onSubmit={handleAddProject} className="space-y-6">
+                <input type="text" required placeholder="Naslov projekta" className="w-full bg-white p-4 rounded-xl font-bold" value={newProject.naslov} onChange={(e) => setNewProject({...newProject, naslov: e.target.value})} />
+                <input type="text" placeholder="Tehnologije" className="w-full bg-white p-4 rounded-xl font-bold" value={newProject.tehnologija} onChange={(e) => setNewProject({...newProject, tehnologija: e.target.value})} />
+                <textarea required rows="5" placeholder="Stručni tekst / Opis" className="w-full bg-white p-4 rounded-xl font-bold" value={newProject.opis} onChange={(e) => setNewProject({...newProject, opis: e.target.value})} />
+
+                <label className="block border-2 border-dashed border-cyan-500/30 rounded-xl p-10 text-center bg-cyan-500/5 hover:bg-cyan-500/10 transition-all cursor-pointer">
+                  <input type="file" className="hidden" onChange={handleFileUpload} accept="image/*,video/*" />
+                  <div className="flex flex-col items-center gap-3">
+                    <FaCloudUploadAlt size={40} className={uploading ? "animate-bounce text-cyan-400" : "text-cyan-500"} />
+                    <span className="text-cyan-500 font-black uppercase text-xs">
+                      {uploading ? "Uploading..." : "Izaberi fajl sa Mac-a"}
+                    </span>
+                  </div>
+                </label>
+
+                <div className="flex items-start gap-3 bg-blue-500/10 border border-blue-500/20 p-5 rounded-xl text-white">
+                  <FaInfoCircle className="text-blue-400 mt-1" />
+                  <p className="text-[11px] text-blue-300 leading-relaxed font-bold uppercase tracking-tighter">
+                    NOTE: Dozvoljeni formati su JPG, PNG i MP4. Maksimalna veličina fajla je 50MB.
                   </p>
-                  <span className="text-[10px] font-mono text-cyan-500 uppercase tracking-widest font-black">
-                    View Research Detail +
-                  </span>
                 </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
 
-      {selectedProject && (
-        <ProjectDetails 
-          project={selectedProject} 
-          onClose={() => setSelectedProject(null)} 
-        />
+                <input type="text" placeholder="URL Slike (Popunjava se automatski)" className="w-full bg-slate-900 text-cyan-500 p-4 rounded-xl font-mono text-[10px]" value={newProject.slika_url} readOnly />
+                <button type="submit" className="w-full bg-cyan-500 text-black font-black py-5 rounded-2xl uppercase tracking-widest hover:bg-cyan-400 transition-all">Objavi novi rad</button>
+              </form>
+            </div>
+
+            {/* ABOUT EDITOR (RESTORED) */}
+            <AdminAboutEditor />
+
+            {/* LISTA RADOVA */}
+            <div className="mt-20 space-y-4 pb-20 text-white">
+              <h2 className="text-xs font-black uppercase tracking-widest text-slate-500 mb-6 pl-4">Lista radova</h2>
+              {projekti.map(proj => (
+                <div key={proj.id} className="bg-[#0f172a] border border-slate-800 p-6 rounded-2xl flex justify-between items-center group">
+                  <h3 className="font-bold uppercase text-sm group-hover:text-cyan-400 transition-colors">{proj.naslov}</h3>
+                  <div className="flex gap-4">
+                    <button className="bg-slate-800 p-2 rounded text-slate-500 hover:text-cyan-400 transition-all"><FaEdit /></button>
+                    <button onClick={() => handleDelete(proj.id)} className="bg-slate-800 p-2 rounded text-slate-500 hover:text-red-500 transition-all"><FaTrash /></button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
       )}
-    </section>
+    </AnimatePresence>
   );
 };
 
-export default Projects;
+export default AdminPanel;

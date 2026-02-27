@@ -41,8 +41,8 @@ const Home = () => (
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 md:gap-8 justify-center items-center">
-          <a href="#projects" className="w-full sm:w-auto bg-white text-black px-10 py-4 rounded-2xl font-black text-xs tracking-widest hover:bg-cyan-400 transition-all uppercase text-center">Projekti</a>
-          <a href="#contact" className="w-full sm:w-auto bg-white/5 text-white border border-white/10 px-10 py-4 rounded-2xl font-black text-xs tracking-widest hover:bg-white/20 transition-all uppercase text-center">Kontakt</a>
+          <a href="#projects" className="w-full sm:w-auto bg-white text-black px-10 py-4 rounded-2xl font-black text-xs tracking-widest hover:bg-cyan-400 transition-all uppercase text-center">Projects</a>
+          <a href="#contact" className="w-full sm:w-auto bg-white/5 text-white border border-white/10 px-10 py-4 rounded-2xl font-black text-xs tracking-widest hover:bg-white/20 transition-all uppercase text-center">Contact</a>
         </div>
       </div>
     </motion.div>

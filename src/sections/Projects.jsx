@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion'; // Upotrebljen ispod!
+import { motion } from 'framer-motion';
 import { supabase } from '../supabaseClient';
 import ProjectDetails from './ProjectDetails';
 
@@ -16,12 +16,11 @@ const Projects = () => {
   }, []);
 
   return (
-    // Smanjen padding pt-20, dodate zaobljene ivice rounded-t-[80px]
     <motion.section 
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       id="projects" 
-      className="pt-20 pb-32 bg-[#020617] text-white rounded-t-[60px] md:rounded-t-[100px] mt-[-60px] relative z-10"
+      className="pt-20 pb-32 bg-[#020617] text-white rounded-t-[60px] md:rounded-t-[100px] -mt-15 relative z-10"
     >
       <div className="max-w-7xl mx-auto px-10">
         <motion.div 

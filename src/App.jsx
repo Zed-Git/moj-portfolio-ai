@@ -12,9 +12,8 @@ import medicalLogo from './assets/medical-logo.jpg';
 
 const Home = () => (
   <motion.main 
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    transition={{ duration: 0.8 }}
+    initial={{ opacity: 0 }} 
+    animate={{ opacity: 1 }} 
     className="max-w-6xl mx-auto pt-32 md:pt-60 pb-32 px-4 md:px-0"
   >
     <div className="bg-[#03040b]/40 backdrop-blur-2xl border border-white/10 p-8 md:p-24 rounded-[40px] md:rounded-[80px] shadow-2xl text-center relative overflow-hidden">

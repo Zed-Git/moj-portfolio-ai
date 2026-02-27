@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion'; // Obadva upotrebljena!
-import { FaEnvelope, FaPaperPlane, FaCloudUploadAlt, FaCheckCircle } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaEnvelope, FaPaperPlane, FaCloudUploadAlt, FaCheckCircle, FaInfoCircle } from 'react-icons/fa';
 
 const Contact = () => {
   const myEmail = "mdzdravko@gmail.com";
@@ -17,7 +17,8 @@ const Contact = () => {
         body: formData
       });
       if (response.ok) setIsSubmitted(true);
-    } catch (error) {
+    } catch (err) {
+      console.error("Submission failed:", err); // Iskoristili smo 'err' varijablu
       alert("Error transmitting message.");
     } finally {
       setIsSending(false);
@@ -25,12 +26,11 @@ const Contact = () => {
   };
 
   return (
-    // Smanjen donji padding pb-16, dodate donje zaobljene ivice rounded-b-[80px]
     <motion.section 
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       id="contact" 
-      className="pt-24 pb-20 bg-black text-white rounded-b-[60px] md:rounded-b-[100px] mb-12 shadow-2xl"
+      className="pt-24 pb-20 bg-black text-white rounded-b-[60px] md:rounded-b-[100px] mb-12 shadow-2xl relative z-10"
     >
       <div className="max-w-4xl mx-auto px-10 text-center">
         <h2 className="text-4xl font-black uppercase italic mb-4 tracking-tighter">
@@ -55,8 +55,17 @@ const Contact = () => {
                 </div>
                 <textarea name="message" rows="5" placeholder="Research proposal..." required className="w-full bg-[#0f172a] border border-slate-800 p-5 rounded-2xl outline-none focus:border-cyan-500 transition-all font-bold text-sm"></textarea>
 
+                {/* VRAĆENI NOTE I UPLOAD BOX */}
                 <div className="bg-[#0f172a] border border-dashed border-cyan-500/20 p-8 rounded-3xl text-center">
                   <FaCloudUploadAlt size={30} className="mx-auto text-slate-600 mb-4" />
+                  
+                  <div className="flex items-start gap-3 bg-blue-500/5 p-4 rounded-xl border border-blue-500/10 mb-6 text-left">
+                    <FaInfoCircle className="text-blue-400 text-xs mt-1 shrink-0" />
+                    <p className="text-[10px] text-blue-300 font-bold uppercase tracking-tighter leading-relaxed">
+                      NOTE: To ensure medical data integrity, please send large datasets, DICOM images, or research videos directly via email client.
+                    </p>
+                  </div>
+
                   <a href={`mailto:${myEmail}`} className="bg-white/5 border border-white/10 px-8 py-2 rounded-full text-[10px] font-black uppercase hover:text-cyan-400 transition-all inline-flex items-center gap-2">
                     <FaEnvelope /> Open Email Client
                   </a>

@@ -2,8 +2,8 @@ import React from 'react';
 import { FaEnvelope, FaPaperPlane, FaCloudUploadAlt, FaInfoCircle } from 'react-icons/fa';
 
 const Contact = () => {
-  // Tvoj profesionalni email
-  const myEmail = "zdravkomijailovic@gmail.com"; 
+  // VAŠ TAČAN EMAIL KOJI STE NAVELI
+  const myEmail = "mdzdravko@gmail.com"; 
 
   return (
     <section id="contact" className="py-32 bg-black text-white">
@@ -15,17 +15,19 @@ const Contact = () => {
           Scientific collaboration & AI research inquiries
         </p>
 
-        {/* FORMA: Povezana sa FormSubmit servisom */}
         <form 
           action={`https://formsubmit.co/${myEmail}`} 
           method="POST"
           className="space-y-6 text-left"
         >
-          {/* Honeypot - Sprečava spam robote da ti šalju lažne poruke */}
+          {/* Honeypot za zaštitu od botova */}
           <input type="text" name="_honey" style={{display: 'none'}} />
           
-          {/* Disable Captcha - Da korisnik ne mora da rešava slike pre slanja */}
+          {/* Isključujemo Captcha za bolji User Experience */}
           <input type="hidden" name="_captcha" value="false" />
+          
+          {/* Nakon slanja, vraća korisnika na vaš sajt (opciono) */}
+          <input type="hidden" name="_next" value="https://moj-portfolio-ai.vercel.app/" />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
@@ -61,7 +63,6 @@ const Contact = () => {
             ></textarea>
           </div>
 
-          {/* VIZUELNI UPLOAD BOX */}
           <div className="bg-[#0f172a] border border-slate-800 p-8 rounded-3xl border-dashed border-cyan-500/20">
             <div className="flex flex-col items-center gap-4">
               <FaCloudUploadAlt size={35} className="text-slate-600" />
@@ -75,7 +76,6 @@ const Contact = () => {
                 </div>
               </div>
               
-              {/* ISPRAVLJENO DUGME ZA EMAIL KLIJENT */}
               <a 
                 href={`mailto:${myEmail}?subject=Scientific Attachment from Portfolio`}
                 className="bg-white/5 border border-white/10 px-8 py-3 rounded-full text-[10px] font-black uppercase hover:bg-white/10 hover:text-cyan-400 transition-all flex items-center gap-2"

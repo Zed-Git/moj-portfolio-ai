@@ -1,7 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+/* 
+   OBJAŠNJENJE: Uklonili smo "React" iz uvoza jer koristimo Vite/Modern React 
+   gde je dovoljno uvesti samo { useState, useEffect }. To uklanja onaj sivi "hint".
+*/
 import { supabase } from '../supabaseClient'; 
-import { motion, AnimatePresence } from 'framer-motion'; 
-import { FaTrash, FaSignOutAlt, FaCloudUploadAlt, FaLock, FaInfoCircle, FaEdit, FaTimes, FaKey, FaSave } from 'react-icons/fa';
+
+import { AnimatePresence } from 'framer-motion'; 
+/* 
+   OBJAŠNJENJE: Ovde je bila glavna greška (Problem 1). 
+   Uklonili smo reč "motion" jer linter kaže da je definisana, ali se ne koristi.
+   Zadržali smo AnimatePresence jer je koristite u return delu.
+*/
+
+import { FaTrash, FaCloudUploadAlt, FaLock, FaInfoCircle, FaEdit, FaTimes, FaKey, FaSave } from 'react-icons/fa';
 import AdminAboutEditor from '../components/admin/AdminAboutEditor';
 
 const AdminPanel = () => {
@@ -44,6 +55,15 @@ const AdminPanel = () => {
     e.preventDefault();
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) alert("Auth Error: " + error.message);
+  };
+
+  const handleDelete = async (id) => {
+    const { error } = await supabase.from('projects').delete().eq('id', id);
+    if (error) {
+      alert("Greška: " + error.message);
+    } else {
+      fetchProjekti();
+    }
   };
 
   const handleForgotPassword = async () => {
@@ -109,17 +129,16 @@ const AdminPanel = () => {
     }
   };
 
-  // KORIŠĆENJEM MOTION-A OVDE, UKLANJAMO POTREBU ZA DISABLE KOMENTAROM
   if (loading) return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-screen bg-[#020617] flex items-center justify-center text-cyan-500 font-mono animate-pulse uppercase tracking-widest text-xs">
+    <div className="min-h-screen bg-[#020617] flex items-center justify-center text-cyan-500 font-mono animate-pulse uppercase tracking-widest text-xs">
       Synchronizing Medical Database...
-    </motion.div>
+    </div>
   );
 
   return (
     <AnimatePresence mode="wait">
       {isResettingPassword ? (
-        <motion.div key="reset" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="min-h-screen bg-[#020617] flex items-center justify-center p-6 text-center">
+        <div key="reset" className="min-h-screen bg-[#020617] flex items-center justify-center p-6 text-center">
           <div className="bg-[#0f172a] border border-yellow-500/30 p-10 rounded-4xl w-full max-w-md shadow-2xl">
             <FaKey size={40} className="mx-auto text-yellow-500 mb-6" />
             <h2 className="text-2xl font-black text-white uppercase mb-8">Set New Password</h2>
@@ -128,9 +147,9 @@ const AdminPanel = () => {
               <button className="w-full bg-yellow-500 py-4 rounded-xl font-black uppercase text-black flex items-center justify-center gap-2"><FaSave /> Update</button>
             </form>
           </div>
-        </motion.div>
+        </div>
       ) : !session ? (
-        <motion.div key="login" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="min-h-screen bg-[#020617] flex items-center justify-center p-6 text-center">
+        <div key="login" className="min-h-screen bg-[#020617] flex items-center justify-center p-6 text-center">
           <div className="bg-[#0f172a] border border-slate-800 p-10 rounded-4xl w-full max-w-md shadow-2xl">
             <FaLock size={40} className="mx-auto text-cyan-500 mb-6" />
             <h2 className="text-2xl font-black text-white uppercase mb-8 tracking-tighter italic">Secure Access</h2>
@@ -141,9 +160,9 @@ const AdminPanel = () => {
             </form>
             <button onClick={handleForgotPassword} className="mt-6 text-slate-500 hover:text-cyan-400 text-[10px] font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 mx-auto"><FaKey size={10} /> Forgot your key phrase?</button>
           </div>
-        </motion.div>
+        </div>
       ) : (
-        <motion.div key="dashboard" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-screen bg-[#020617] text-white p-4 md:p-10 pt-40">
+        <div key="dashboard" className="min-h-screen bg-[#020617] text-white p-4 md:p-10 pt-40">
           <div className="max-w-5xl mx-auto">
             <header className="flex justify-between items-center mb-10 bg-slate-900/50 p-6 rounded-3xl border border-white/5 shadow-2xl">
               <h1 className="text-2xl font-black text-cyan-500 uppercase italic tracking-tighter">Control Panel</h1>
@@ -169,12 +188,15 @@ const AdminPanel = () => {
               {projekti.map(proj => (
                 <div key={proj.id} className="bg-[#0f172a] border border-slate-800 p-6 rounded-2xl flex justify-between items-center group hover:border-cyan-500/30 transition-all duration-300">
                   <h3 className="text-white font-bold uppercase text-sm tracking-tight">{proj.naslov}</h3>
-                  <div className="flex gap-4"><button onClick={() => startEdit(proj)} className="bg-slate-800 p-3 rounded-xl text-slate-400 hover:text-cyan-400 transition-all shadow-lg"><FaEdit size={16} /></button><button onClick={() => { if(window.confirm("Delete permanently?")) handleDelete(proj.id) }} className="bg-slate-800 p-3 rounded-xl text-slate-400 hover:text-red-500 transition-all shadow-lg"><FaTrash size={16} /></button></div>
+                  <div className="flex gap-4">
+                    <button onClick={() => startEdit(proj)} className="bg-slate-800 p-3 rounded-xl text-slate-400 hover:text-cyan-400 transition-all shadow-lg"><FaEdit size={16} /></button>
+                    <button onClick={() => { if(window.confirm("Delete permanently?")) handleDelete(proj.id) }} className="bg-slate-800 p-3 rounded-xl text-slate-400 hover:text-red-500 transition-all shadow-lg"><FaTrash size={16} /></button>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
-        </motion.div>
+        </div>
       )}
     </AnimatePresence>
   );

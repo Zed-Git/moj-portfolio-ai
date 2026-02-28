@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'; // Dodali smo useCallback radi optimizacije
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../supabaseClient';
 import { motion, AnimatePresence } from 'framer-motion'; 
 import { 
@@ -6,10 +6,11 @@ import {
   FaInfoCircle, FaEdit, FaTimes, FaFingerprint 
 } from 'react-icons/fa';
 
+// Uvozimo Vaš editor za biografiju
 import AdminAboutEditor from '../components/admin/AdminAboutEditor';
 
 const AdminPanel = () => {
-  // --- STANJA ---
+  // --- STANJA (States) ---
   const [session, setSession] = useState(null);
   const [projekti, setProjekti] = useState([]); 
   const [loading, setLoading] = useState(true);
@@ -28,9 +29,8 @@ const AdminPanel = () => {
     link: ''
   });
 
-  // --- 1. DEFINICIJA FUNKCIJA (Mora ići PRE useEffect-a) ---
-  
-  // Funkcija za dovlačenje projekata iz baze
+  // --- LOGIKA ZA PODATKE (Mora biti definisana pre useEffect-a) ---
+
   const fetchProjects = useCallback(async () => {
     try {
       const { data, error } = await supabase
@@ -45,21 +45,14 @@ const AdminPanel = () => {
     }
   }, []);
 
-  // Funkcija za "Forgot Key Phrase"
-  const handleForgotPhrase = () => {
-    alert("Sistem zaštite: Molimo Vas da proverite Vaš primarni email za instrukcije o oporavku pristupnog ključa.");
-  };
-
-  // --- 2. KONTROLA SESIJE (useEffect) ---
   useEffect(() => {
-    // Proveravamo sesiju odmah
+    // Provera sesije pri učitavanju
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (session) fetchProjects();
       setLoading(false);
     });
 
-    // Slušamo promene (login/logout)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       if (session) fetchProjects();
@@ -68,24 +61,50 @@ const AdminPanel = () => {
     return () => subscription.unsubscribe();
   }, [fetchProjects]);
 
-  // --- 3. LOGIKA ZA FORME ---
+  // --- FUNKCIJE ZA DUGMAD ---
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) alert('Pristup odbijen: ' + error.message);
+    if (error) alert('Greška pri prijavi: ' + error.message);
     setLoading(false);
   };
 
-  const simulateUpload = () => {
-    setUploading(true);
-    setTimeout(() => {
-      setUploading(false);
-      alert("Simulacija slanja završena. (Ovde ćemo kasnije povezati pravi upload)");
-    }, 2000);
+  const handleEdit = (rad) => {
+    // Kada kliknete na olovku, podaci tog rada se popunjavaju u gornju formu za izmenu
+    setEditingId(rad.id);
+    setNewProject({
+      title: rad.title,
+      technologies: rad.technologies || '',
+      description: rad.description || '',
+      image_url: rad.image_url || '',
+      link: rad.link || ''
+    });
+    // Automatski skroluje na vrh do forme
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // --- 4. STILOVI (ZED AI-PORTFOLIO TEMA) ---
+  const handleDelete = async (id) => {
+    if (window.confirm("Da li ste sigurni da želite da obrišete ovaj naučni rad?")) {
+      const { error } = await supabase.from('projects').delete().eq('id', id);
+      if (error) alert("Greška pri brisanju: " + error.message);
+      else fetchProjects(); // Osveži listu nakon brisanja
+    }
+  };
+
+  const handlePasswordReset = async () => {
+    if (!newPassword) return alert("Unesite novu lozinku.");
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) alert("Greška: " + error.message);
+    else {
+      alert("Lozinka je uspešno promenjena!");
+      setIsResettingPassword(false);
+      setNewPassword('');
+    }
+  };
+
+  // --- STILOVI TEMA (ZED AI-PORTFOLIO) ---
   const theme = {
     bg: '#0a0b14',
     card: '#161b2b',
@@ -93,128 +112,96 @@ const AdminPanel = () => {
     inputBg: '#1f2537'
   };
 
-  if (loading) return (
-    <div style={{background: theme.bg, color: 'white', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', fontFamily: 'sans-serif'}}>
-      <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1 }} style={{ border: `4px solid ${theme.accent}`, borderTop: '4px solid transparent', borderRadius: '50%', width: '40px', height: '40px' }} />
-    </div>
-  );
+  if (loading) return <div style={{background: theme.bg, color: 'white', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>Inicijalizacija...</div>;
 
-  // --- 5. PRIKAZ ZA LOGIN (SECURE ACCESS) ---
+  // 1. PRIKAZ LOGIN FORME (Ako nema sesije)
   if (!session) {
     return (
       <div style={{ background: theme.bg, minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', fontFamily: 'sans-serif' }}>
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }} 
-          animate={{ opacity: 1, y: 0 }} 
-          style={{ background: theme.card, padding: '40px', borderRadius: '24px', width: '420px', textAlign: 'center', border: '1px solid #2d3446', boxShadow: '0 20px 40px rgba(0,0,0,0.4)' }}
-        >
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} style={{ background: theme.card, padding: '40px', borderRadius: '24px', width: '400px', textAlign: 'center', border: '1px solid #2d3446' }}>
           <FaFingerprint style={{ fontSize: '60px', color: theme.accent, marginBottom: '20px' }} />
-          <h2 style={{ color: 'white', letterSpacing: '3px', marginBottom: '35px', fontWeight: '300' }}>SECURE ACCESS</h2>
-          
+          <h2 style={{ color: 'white', letterSpacing: '3px', marginBottom: '30px' }}>SECURE ACCESS</h2>
           <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-            <input 
-              type="email" 
-              placeholder="mdzdravko@Gmail.com" 
-              value={email} 
-              onChange={(e) => setEmail(e.target.value)} 
-              style={{ padding: '16px', borderRadius: '12px', border: '1px solid #2d3446', background: theme.inputBg, color: 'white', fontSize: '16px' }} 
-            />
-            <input 
-              type="password" 
-              placeholder="••••••••" 
-              value={password} 
-              onChange={(e) => setPassword(e.target.value)} 
-              style={{ padding: '16px', borderRadius: '12px', border: '1px solid #2d3446', background: theme.inputBg, color: 'white', fontSize: '16px' }} 
-            />
-            <button type="submit" style={{ padding: '16px', borderRadius: '12px', border: 'none', background: theme.accent, color: '#000', fontWeight: 'bold', cursor: 'pointer', fontSize: '16px', marginTop: '10px' }}>AUTHORIZE</button>
+            <input type="email" placeholder="mdzdravko@Gmail.com" value={email} onChange={(e) => setEmail(e.target.value)} style={{ padding: '15px', borderRadius: '12px', border: '1px solid #2d3446', background: theme.inputBg, color: 'white' }} />
+            <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} style={{ padding: '15px', borderRadius: '12px', border: '1px solid #2d3446', background: theme.inputBg, color: 'white' }} />
+            <button type="submit" style={{ padding: '15px', borderRadius: '12px', border: 'none', background: theme.accent, color: 'black', fontWeight: 'bold', cursor: 'pointer' }}>AUTHORIZE</button>
           </form>
-          
-          <button 
-            onClick={handleForgotPhrase}
-            style={{ background: 'none', border: 'none', color: '#555', marginTop: '25px', cursor: 'pointer', fontSize: '13px', letterSpacing: '1px' }}
-          >
-            🔑 FORGOT YOUR KEY PHRASE?
-          </button>
+          <button onClick={() => alert("Kontaktirajte administratora za oporavak ključa.")} style={{ background: 'none', border: 'none', color: '#555', marginTop: '20px', cursor: 'pointer' }}>🔑 FORGOT YOUR KEY PHRASE?</button>
         </motion.div>
       </div>
     );
   }
 
-  // --- 6. PRIKAZ ZA DASHBOARD (CONTROL PANEL) ---
+  // 2. PRIKAZ ADMIN PANELA (Ako je ulogovan)
   return (
-    <div style={{ background: theme.bg, minHeight: '100vh', color: 'white', fontFamily: 'sans-serif', padding: '30px' }}>
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '1100px', margin: '0 auto 40px auto', borderBottom: '1px solid #2d3446', paddingBottom: '20px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-           <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: theme.accent }}></div>
-           <h2 style={{ color: theme.accent, fontSize: '18px', letterSpacing: '2px', fontWeight: 'bold' }}>CONTROL PANEL</h2>
-        </div>
-        <button onClick={() => supabase.auth.signOut()} style={{ background: 'rgba(255, 75, 75, 0.1)', color: '#ff4b4b', border: '1px solid #ff4b4b', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px' }}>END SESSION</button>
+    <div style={{ background: theme.bg, minHeight: '100vh', color: 'white', fontFamily: 'sans-serif', padding: '20px' }}>
+      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '1000px', margin: '0 auto 30px auto', borderBottom: '1px solid #2d3446', paddingBottom: '15px' }}>
+        <h2 style={{ color: theme.accent, letterSpacing: '2px', fontSize: '16px' }}>CONTROL PANEL</h2>
+        <button onClick={() => supabase.auth.signOut()} style={{ background: 'rgba(255, 75, 75, 0.1)', color: '#ff4b4b', border: '1px solid #ff4b4b', padding: '8px 15px', borderRadius: '8px', cursor: 'pointer' }}>END SESSION</button>
       </header>
 
-      <main style={{ maxWidth: '1100px', margin: '0 auto' }}>
+      <main style={{ maxWidth: '1000px', margin: '0 auto' }}>
         
-        {/* DODAVANJE RADAVA */}
-        <section style={{ background: theme.card, padding: '35px', borderRadius: '20px', border: '1px solid #2d3446', marginBottom: '40px' }}>
-          <h4 style={{ color: theme.accent, marginBottom: '25px', fontSize: '14px', letterSpacing: '1px' }}>// ADD NEW SCIENTIFIC ENTRY</h4>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <input type="text" placeholder="Project Title" value={newProject.title} onChange={(e) => setNewProject({...newProject, title: e.target.value})} style={{ padding: '18px', borderRadius: '12px', border: '1px solid #2d3446', background: theme.inputBg, color: 'white', fontSize: '16px' }} />
-            <input type="text" placeholder="Technologies / Stack" value={newProject.technologies} onChange={(e) => setNewProject({...newProject, technologies: e.target.value})} style={{ padding: '18px', borderRadius: '12px', border: '1px solid #2d3446', background: theme.inputBg, color: 'white', fontSize: '16px' }} />
-            <textarea placeholder="Scientific Abstract" value={newProject.description} onChange={(e) => setNewProject({...newProject, description: e.target.value})} style={{ padding: '18px', borderRadius: '12px', border: '1px solid #2d3446', background: theme.inputBg, color: 'white', fontSize: '16px', minHeight: '120px' }} />
+        {/* FORMA ZA DODAVANJE / IZMENU */}
+        <section style={{ background: theme.card, padding: '30px', borderRadius: '20px', border: '1px solid #2d3446', marginBottom: '30px' }}>
+          <h4 style={{ color: theme.accent, marginBottom: '20px' }}>{editingId ? "// EDIT SCIENTIFIC ENTRY" : "// ADD NEW SCIENTIFIC ENTRY"}</h4>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            <input type="text" placeholder="Project Title" value={newProject.title} onChange={(e) => setNewProject({...newProject, title: e.target.value})} style={{ padding: '15px', borderRadius: '10px', border: '1px solid #2d3446', background: theme.inputBg, color: 'white' }} />
+            <input type="text" placeholder="Technologies / Stack" value={newProject.technologies} onChange={(e) => setNewProject({...newProject, technologies: e.target.value})} style={{ padding: '15px', borderRadius: '10px', border: '1px solid #2d3446', background: theme.inputBg, color: 'white' }} />
+            <textarea placeholder="Scientific Abstract" value={newProject.description} onChange={(e) => setNewProject({...newProject, description: e.target.value})} style={{ padding: '15px', borderRadius: '10px', border: '1px solid #2d3446', background: theme.inputBg, color: 'white', minHeight: '100px' }} />
             
-            <div 
-              onClick={simulateUpload}
-              style={{ border: '2px dashed #2d3446', padding: '40px', textAlign: 'center', borderRadius: '15px', color: theme.accent, cursor: 'pointer', transition: '0.3s' }}
-            >
-              <FaCloudUploadAlt style={{ fontSize: '35px', marginBottom: '10px' }} />
-              <p style={{ fontSize: '14px', fontWeight: 'bold' }}>{uploading ? "UPLOADING ASSET..." : "REPLACE / UPLOAD MEDIA ASSET"}</p>
+            <div style={{ border: '2px dashed #2d3446', padding: '20px', textAlign: 'center', borderRadius: '10px', color: theme.accent }}>
+              <FaCloudUploadAlt style={{ fontSize: '30px' }} />
+              <p>{uploading ? "UPLOADING..." : "REPLACE / UPLOAD MEDIA ASSET"}</p>
             </div>
             
-            <button style={{ background: theme.accent, padding: '20px', border: 'none', borderRadius: '12px', fontWeight: 'bold', fontSize: '16px', color: '#000', cursor: 'pointer' }}>PUBLISH RESEARCH</button>
+            <button style={{ background: theme.accent, padding: '15px', border: 'none', borderRadius: '10px', fontWeight: 'bold', cursor: 'pointer', color: 'black' }}>
+              {editingId ? "UPDATE RESEARCH" : "PUBLISH RESEARCH"}
+            </button>
+            {editingId && <button onClick={() => {setEditingId(null); setNewProject({title:'', technologies:'', description:'', image_url:'', link:''})}} style={{ background: 'none', color: 'white', border: '1px solid #444', padding: '10px', borderRadius: '10px' }}>CANCEL EDIT</button>}
           </div>
         </section>
 
-        {/* O MENI EDITOR */}
-        <section style={{ background: theme.card, padding: '35px', borderRadius: '20px', border: '1px solid #2d3446', marginBottom: '40px' }}>
-          <h4 style={{ color: theme.accent, marginBottom: '25px', fontSize: '14px' }}>UREDI "O MENI" SEKCIJU</h4>
+        {/* EDITOR BIOGRAFIJE */}
+        <section style={{ background: theme.card, padding: '30px', borderRadius: '20px', border: '1px solid #2d3446', marginBottom: '30px' }}>
+          <h4 style={{ color: theme.accent, marginBottom: '20px' }}>UREDI "O MENI" SEKCIJU</h4>
           <AdminAboutEditor />
         </section>
 
-        {/* LISTA RADOVA IZ BAZE */}
-        <section style={{ background: theme.card, padding: '35px', borderRadius: '20px', border: '1px solid #2d3446' }}>
-          <h4 style={{ color: '#555', fontSize: '12px', marginBottom: '25px', letterSpacing: '2px' }}>ACTIVE DATABASE RECORDS</h4>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-            {projekti.length === 0 ? (
-              <p style={{ color: '#444' }}>Trenutno nema zapisa u bazi podataka.</p>
-            ) : (
-              projekti.map(p => (
-                <div key={p.id} style={{ background: theme.inputBg, padding: '20px', borderRadius: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: editingId === p.id ? `1px solid ${theme.accent}` : '1px solid transparent' }}>
-                  <span style={{ fontWeight: 'bold', textTransform: 'uppercase', fontSize: '14px', letterSpacing: '1px' }}>{p.title}</span>
-                  <div style={{ display: 'flex', gap: '15px' }}>
-                    <button onClick={() => setEditingId(p.id)} style={{ background: '#2d3446', color: 'white', border: 'none', padding: '12px', borderRadius: '10px', cursor: 'pointer' }}><FaEdit /></button>
-                    <button onClick={() => alert('Brisanje radova će biti omogućeno u sledećoj fazi.')} style={{ background: '#2d3446', color: '#ff4b4b', border: 'none', padding: '12px', borderRadius: '10px', cursor: 'pointer' }}><FaTrash /></button>
-                  </div>
+        {/* LISTA RADOVA (ACTIVE DATABASE RECORDS) */}
+        <section style={{ background: theme.card, padding: '30px', borderRadius: '20px', border: '1px solid #2d3446' }}>
+          <h4 style={{ color: '#555', fontSize: '11px', letterSpacing: '2px', marginBottom: '20px' }}>ACTIVE DATABASE RECORDS</h4>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {projekti.map(p => (
+              <div key={p.id} style={{ background: '#1f2537', padding: '15px', borderRadius: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: editingId === p.id ? `1px solid ${theme.accent}` : '1px solid transparent' }}>
+                <span style={{ fontWeight: 'bold', fontSize: '13px', textTransform: 'uppercase' }}>{p.title}</span>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button onClick={() => handleEdit(p)} style={{ background: '#2d3446', color: 'white', border: 'none', padding: '10px', borderRadius: '8px', cursor: 'pointer' }}><FaEdit /></button>
+                  <button onClick={() => handleDelete(p.id)} style={{ background: '#2d3446', color: '#ff4b4b', border: 'none', padding: '10px', borderRadius: '8px', cursor: 'pointer' }}><FaTrash /></button>
                 </div>
-              ))
-            )}
+              </div>
+            ))}
           </div>
         </section>
 
-        {/* RESET LOZINKE */}
-        <div style={{ marginTop: '50px', textAlign: 'center', paddingBottom: '50px' }}>
-          <button onClick={() => setIsResettingPassword(!isResettingPassword)} style={{ background: 'transparent', color: '#555', border: 'none', cursor: 'pointer', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '10px', margin: '0 auto' }}>
+        {/* PROMENA LOZINKE (Sada sa funkcijom) */}
+        <div style={{ marginTop: '40px', textAlign: 'center', paddingBottom: '40px' }}>
+          <button onClick={() => setIsResettingPassword(!isResettingPassword)} style={{ background: 'transparent', color: '#555', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', margin: '0 auto' }}>
             <FaLock /> {isResettingPassword ? "ZATVORI" : "PROMENI LOZINKU"}
           </button>
+          
           <AnimatePresence>
             {isResettingPassword && (
               <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} style={{ overflow: 'hidden' }}>
-                <div style={{ marginTop: '20px', display: 'flex', gap: '10px', justifyContent: 'center' }}>
-                  <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Nova lozinka" style={{ padding: '15px', borderRadius: '10px', border: '1px solid #2d3446', background: theme.inputBg, color: 'white' }} />
-                  <button style={{ background: theme.accent, padding: '0 20px', borderRadius: '10px', border: 'none', fontWeight: 'bold' }}>POTVRDI</button>
+                <div style={{ marginTop: '15px', display: 'flex', gap: '10px', justifyContent: 'center' }}>
+                  <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Nova lozinka" style={{ padding: '12px', borderRadius: '8px', border: '1px solid #2d3446', background: theme.inputBg, color: 'white' }} />
+                  <button onClick={handlePasswordReset} style={{ background: theme.accent, padding: '0 20px', borderRadius: '8px', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}>POTVRDI</button>
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
+
       </main>
     </div>
   );

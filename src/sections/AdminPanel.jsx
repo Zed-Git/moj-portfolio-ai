@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient'; 
+// motion je sada aktivno uposlen, ne treba nam više eslint-disable!
 import { motion, AnimatePresence } from 'framer-motion'; 
 import { FaTrash, FaSignOutAlt, FaCloudUploadAlt, FaLock, FaInfoCircle, FaEdit, FaTimes, FaKey, FaSave } from 'react-icons/fa';
 import AdminAboutEditor from '../components/admin/AdminAboutEditor';
@@ -68,6 +69,18 @@ const AdminPanel = () => {
     }
   };
 
+  // FUNKCIJA ZA BRISANJE KOJA JE NEDOSTAJALA
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure? This action is permanent.")) {
+      const { error } = await supabase.from('projects').delete().eq('id', id);
+      if (error) {
+        alert("Error deleting: " + error.message);
+      } else {
+        fetchProjekti(); // Osveži listu nakon brisanja
+      }
+    }
+  };
+
   const handleFileUpload = async (event) => {
     try {
       setUploading(true);
@@ -104,12 +117,12 @@ const AdminPanel = () => {
       setEditingId(null);
       setNewProject({ naslov: '', opis: '', tehnologija: '', slika_url: '' });
       fetchProjekti();
+      alert("Successfully saved!");
     } catch (error) {
       alert("Error: " + error.message);
     }
   };
 
-  // KORIŠĆENJEM MOTION-A OVDE, UKLANJAMO POTREBU ZA DISABLE KOMENTAROM
   if (loading) return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="min-h-screen bg-[#020617] flex items-center justify-center text-cyan-500 font-mono animate-pulse uppercase tracking-widest text-xs">
       Synchronizing Medical Database...
@@ -149,6 +162,7 @@ const AdminPanel = () => {
               <h1 className="text-2xl font-black text-cyan-500 uppercase italic tracking-tighter">Control Panel</h1>
               <button onClick={() => supabase.auth.signOut()} className="bg-red-500/20 text-red-500 border border-red-500/20 px-6 py-2 rounded-xl text-[10px] font-black uppercase hover:bg-red-500 hover:text-white transition-all">End Session</button>
             </header>
+            
             <div className={`bg-[#0f172a] border transition-all duration-500 p-6 md:p-10 rounded-4xl shadow-2xl mb-20 ${editingId ? 'border-yellow-500/50' : 'border-slate-800'}`}>
               <div className="flex justify-between items-center mb-8">
                 <h2 className={`font-bold uppercase text-xs tracking-widest italic ${editingId ? 'text-yellow-500' : 'text-cyan-400'}`}>{editingId ? `// Editing Record ID: ${editingId}` : '// Add New Scientific Entry'}</h2>
@@ -163,13 +177,21 @@ const AdminPanel = () => {
                 <button type="submit" className={`w-full font-black py-5 rounded-2xl transition-all uppercase tracking-[0.2em] text-sm shadow-xl ${editingId ? 'bg-yellow-500 text-black' : 'bg-cyan-500 text-black'}`}>{editingId ? 'Update Research Data' : 'Publish Research'}</button>
               </form>
             </div>
+
             <AdminAboutEditor />
+
             <div className="mt-20 space-y-4 pb-20">
               <h2 className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.4em] mb-8 pl-4">Active Database Records</h2>
               {projekti.map(proj => (
                 <div key={proj.id} className="bg-[#0f172a] border border-slate-800 p-6 rounded-2xl flex justify-between items-center group hover:border-cyan-500/30 transition-all duration-300">
                   <h3 className="text-white font-bold uppercase text-sm tracking-tight">{proj.naslov}</h3>
-                  <div className="flex gap-4"><button onClick={() => startEdit(proj)} className="bg-slate-800 p-3 rounded-xl text-slate-400 hover:text-cyan-400 transition-all shadow-lg"><FaEdit size={16} /></button><button onClick={() => { if(window.confirm("Delete permanently?")) handleDelete(proj.id) }} className="bg-slate-800 p-3 rounded-xl text-slate-400 hover:text-red-500 transition-all shadow-lg"><FaTrash size={16} /></button></div>
+                  <div className="flex gap-4">
+                    <button onClick={() => startEdit(proj)} className="bg-slate-800 p-3 rounded-xl text-slate-400 hover:text-cyan-400 transition-all shadow-lg"><FaEdit size={16} /></button>
+                    {/* OVDE JE BILA GREŠKA - SADA POZIVAMO handleDelete KOJI JE DEFINISAN GORE */}
+                    <button onClick={() => handleDelete(proj.id)} className="bg-slate-800 p-3 rounded-xl text-slate-400 hover:text-red-500 transition-all shadow-lg">
+                      <FaTrash size={16} />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

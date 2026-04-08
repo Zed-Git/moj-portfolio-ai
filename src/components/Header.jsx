@@ -149,7 +149,9 @@ const Header = () => {
             type="button"
             // Koristimo stvarnu visinu headera (mereno u runtime-u) + safe-area top, da overlay nikad ne pređe preko ikonica.
             style={{ top: `calc(${headerHeightPx}px + env(safe-area-inset-top))` }}
-            className="absolute left-0 right-0 bottom-0 bg-black/65 backdrop-blur-[2px]"
+            // BEZ zatamnjenja: korisnik je tražio da se ukloni “tamno polje” potpuno.
+            // Ovaj element ostaje samo kao “click-catcher” da klik van drawer-a zatvori meni.
+            className="absolute left-0 right-0 bottom-0 bg-transparent"
             onClick={() => setMenuOpen(false)}
             aria-label="Close menu overlay"
           />

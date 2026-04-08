@@ -8,8 +8,12 @@
       - Podrazumevani Vite template koristi /vite.svg kao favicon — zamenjeno je sa /favicon.svg
         da kartica u pregledaču i obeleživači prikazuju ikonicu u stilu tvog portfolija (boje + EKG motiv).
       - type="image/svg+xml" ostaje kao u Vite šablonu jer SVG favicon skalira oštro na svim DPI.
+      - VAŽNO (Safari / automatski zahtev): pregledači često traže /favicon.ico pre nego što pročitaju <link>.
+        Zbog SPA rewrite pravila na Vercelu, /favicon.ico je vraćao index.html umesto slike — zato je u
+        vercel.json dodat redirect sa favicon.ico na favicon.svg (vidi taj fajl).
     -->
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- sizes="any" pomaže Safari/modernim pregledačima da pravilno prihvate SVG favicon. -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" sizes="any" />
     <!-- Apple uređaji pri dodavanju na početni ekran koriste ovaj link (isti resurs kao favicon). -->
     <link rel="apple-touch-icon" href="/favicon.svg" />
     <!-- Naslov kartice: engleski, u skladu sa sadržajem sajta (ne diramo React rute ni build). -->

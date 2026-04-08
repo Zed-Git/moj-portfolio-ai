@@ -67,17 +67,15 @@ const Header = () => {
             >
               <FaLinkedin className="text-xl" aria-hidden />
             </a>
-            {x ? (
-              <a
-                href={x}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={socialClass}
-                aria-label="X (Twitter) profile"
-              >
-                <FaXTwitter className="text-xl" aria-hidden />
-              </a>
-            ) : null}
+            <a
+              href={x}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={socialClass}
+              aria-label="X (Twitter) profile"
+            >
+              <FaXTwitter className="text-xl" aria-hidden />
+            </a>
           </div>
         </nav>
 
@@ -92,17 +90,15 @@ const Header = () => {
           >
             <FaLinkedin className="text-xl" aria-hidden />
           </a>
-          {x ? (
-            <a
-              href={x}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={socialClass}
-              aria-label="X (Twitter) profile"
-            >
-              <FaXTwitter className="text-xl" aria-hidden />
-            </a>
-          ) : null}
+          <a
+            href={x}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={socialClass}
+            aria-label="X (Twitter) profile"
+          >
+            <FaXTwitter className="text-xl" aria-hidden />
+          </a>
           <button
             type="button"
             className="min-h-11 min-w-11 flex items-center justify-center rounded-xl text-white/80 hover:bg-white/10 hover:text-cyan-400 transition-colors"
@@ -120,7 +116,7 @@ const Header = () => {
       {menuOpen ? (
         <div
           id="mobile-nav-panel"
-          className="fixed inset-0 z-[200] md:hidden flex flex-col bg-[#03040b]/98 backdrop-blur-xl pt-24 px-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]"
+          className="fixed inset-0 z-200 md:hidden flex flex-col bg-[#03040b]/98 backdrop-blur-xl pt-24 px-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]"
           role="dialog"
           aria-modal="true"
           aria-label="Site navigation"

@@ -4,8 +4,7 @@
  * LinkedIn: podrazumevano MedExNews profil (javno povezan sa radom Prof. Mijailovića kao urednika portala).
  * Zameni sa VITE_LINKEDIN_URL ako želiš lični /in/... profil (lokalno .env i Vercel → Environment Variables).
  *
- * X (Twitter): postavi VITE_X_URL (npr. https://x.com/tvoj_handle) — bez toga ikonica X se ne prikazuje,
- * da ne vodi na pogrešan nalog.
+ * X (Twitter): podrazumevano MedExNews (@medexnews); zameni sa VITE_X_URL za lični nalog.
  */
 export const SITE_URL = 'https://www.mdzdravko.com'
 
@@ -13,14 +12,17 @@ export const SITE_URL = 'https://www.mdzdravko.com'
 const DEFAULT_LINKEDIN =
   'https://www.linkedin.com/in/medexnews-evidence-based-personalized-cardiology-7063b079'
 
+/** Podrazumevani X (isti brend kao portal); override preko VITE_X_URL */
+const DEFAULT_X = 'https://x.com/medexnews'
+
 export const metaDescription =
   'Portfolio of Z. Mijailović, MD, PhD, FACC, ARDMS — cardiologist and AI in health-tech: projects, research collaboration, and evidence-based medicine.'
 
 export function getSocialLinks() {
   const linkedin = (import.meta.env.VITE_LINKEDIN_URL || DEFAULT_LINKEDIN).trim()
-  const x = (import.meta.env.VITE_X_URL || '').trim()
+  const x = (import.meta.env.VITE_X_URL || DEFAULT_X).trim()
   return {
     linkedin: linkedin || DEFAULT_LINKEDIN,
-    x: x || null,
+    x: x || DEFAULT_X,
   }
 }

@@ -2,9 +2,18 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>moj-portfolio</title>
+    <!--
+      ODLUKA (odstupanje od Vite “zlatnog standarda”):
+      - Podrazumevani Vite template koristi /vite.svg kao favicon — zamenjeno je sa /favicon.svg
+        da kartica u pregledaču i obeleživači prikazuju ikonicu u stilu tvog portfolija (boje + EKG motiv).
+      - type="image/svg+xml" ostaje kao u Vite šablonu jer SVG favicon skalira oštro na svim DPI.
+    -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- Apple uređaji pri dodavanju na početni ekran koriste ovaj link (isti resurs kao favicon). -->
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <!-- Naslov kartice: engleski, u skladu sa sadržajem sajta (ne diramo React rute ni build). -->
+    <title>Z. Mijailović | Cardiology &amp; AI Portfolio</title>
   </head>
   <body>
     <div id="root"></div>

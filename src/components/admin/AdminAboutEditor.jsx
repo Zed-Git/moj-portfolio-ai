@@ -12,7 +12,7 @@ const AdminAboutEditor = () => {
       try {
         const { data } = await supabase.from('site_settings').select('content').eq('section_name', 'about_me').single();
         if (data) setText(data.content);
-      } catch (error) {
+      } catch {
         console.log("Inicijalizacija baze...");
       }
     };

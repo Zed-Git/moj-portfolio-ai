@@ -23,7 +23,9 @@ export default defineConfig([
       },
     },
     rules: {
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      // React komponente (veliko slovo) + "motion" iz framer-motion: <motion.div> koristi "motion",
+      // ali ESLint ponekad ne vidi tu upotrebu kao "čitanje" promenljive — zato ignorišemo ime "motion".
+      'no-unused-vars': ['error', { varsIgnorePattern: '^([A-Z_].*|motion)$' }],
     },
   },
 ])

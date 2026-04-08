@@ -1,7 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-// eslint-disable-next-line
-import { motion } from 'framer-motion'; 
+import { motion } from 'framer-motion';
 import Header from './components/Header';
 import About from './sections/About';
 import Projects from './sections/Projects';
@@ -38,9 +37,13 @@ const Home = () => (
           className="relative mb-10"
         >
           <div className="absolute inset-0 bg-cyan-500 rounded-full blur-2xl opacity-20 animate-pulse"></div>
-          <img 
-            src={zdravkoImg} 
-            alt="Z. Mijailovic" 
+          <img
+            src={zdravkoImg}
+            alt="Z. Mijailovic"
+            width={224}
+            height={224}
+            fetchPriority="high"
+            decoding="async"
             className="w-48 h-48 md:w-56 md:h-56 rounded-full object-cover border-4 border-white/10 shadow-2xl relative z-10"
           />
         </motion.div>

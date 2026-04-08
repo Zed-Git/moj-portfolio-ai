@@ -46,7 +46,13 @@ const Projects = () => {
               onClick={() => setSelectedProject(project)}
             >
               <div className="h-64 overflow-hidden">
-                <img src={project.slika_url} alt="" className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-all duration-700" />
+                <img
+                  src={project.slika_url}
+                  alt=""
+                  className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-all duration-700"
+                  loading="lazy"
+                  decoding="async"
+                />
               </div>
               <div className="p-6 text-left">
                 <h3 className="text-lg font-bold uppercase mb-2">{project.naslov}</h3>

@@ -2,7 +2,52 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--
+      Mobilni / iPhone / iPad: width=device-width + initial-scale; viewport-fit=cover omogućava full-screen
+      iza "notch" i safe-area (env) u CSS-u — ne koristimo maximum-scale=1 jer smanjuje pristupačnost (zoom).
+    -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta
+      name="description"
+      content="Portfolio of Z. Mijailović, MD, PhD, FACC, ARDMS — cardiologist and AI in health-tech: projects, research collaboration, and evidence-based medicine."
+    />
+    <meta name="author" content="Z. Mijailović" />
+    <meta name="theme-color" content="#03040b" />
+    <meta name="color-scheme" content="dark" />
+    <!-- iOS / Safari: status bar; ne menjaju sadržaj sajta, samo izgled sistema -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Z. Mijailović" />
+    <link rel="canonical" href="https://www.mdzdravko.com/" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Open Graph (Facebook, LinkedIn, iMessage preview, itd.) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.mdzdravko.com/" />
+    <meta property="og:title" content="Z. Mijailović | Cardiology &amp; AI Portfolio" />
+    <meta
+      property="og:description"
+      content="Portfolio of Z. Mijailović, MD, PhD, FACC, ARDMS — cardiologist and AI in health-tech: projects, research collaboration, and evidence-based medicine."
+    />
+    <meta property="og:image" content="https://www.mdzdravko.com/og-image.webp" />
+    <meta property="og:image:width" content="1700" />
+    <meta property="og:image:height" content="2567" />
+    <meta property="og:locale" content="en_US" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Z. Mijailović | Cardiology &amp; AI Portfolio" />
+    <meta
+      name="twitter:description"
+      content="Portfolio of Z. Mijailović, MD, PhD, FACC, ARDMS — cardiologist and AI in health-tech."
+    />
+    <meta name="twitter:image" content="https://www.mdzdravko.com/og-image.webp" />
+
+    <!-- Brže učitavanje Supabase API-ja (već koristi klijent u aplikaciji) -->
+    <link rel="preconnect" href="https://ldmsmdcprrxetcpraime.supabase.co" crossorigin />
+    <link rel="dns-prefetch" href="https://ldmsmdcprrxetcpraime.supabase.co" />
+
     <!--
       ODLUKA (odstupanje od Vite “zlatnog standarda”):
       - Podrazumevani Vite template koristi /vite.svg kao favicon — zamenjeno je sa /favicon.svg
@@ -12,12 +57,25 @@
         Zbog SPA rewrite pravila na Vercelu, /favicon.ico je vraćao index.html umesto slike — zato je u
         vercel.json dodat redirect sa favicon.ico na favicon.svg (vidi taj fajl).
     -->
-    <!-- sizes="any" pomaže Safari/modernim pregledačima da pravilno prihvate SVG favicon. -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" sizes="any" />
-    <!-- Apple uređaji pri dodavanju na početni ekran koriste ovaj link (isti resurs kao favicon). -->
     <link rel="apple-touch-icon" href="/favicon.svg" />
-    <!-- Naslov kartice: engleski, u skladu sa sadržajem sajta (ne diramo React rute ni build). -->
     <title>Z. Mijailović | Cardiology &amp; AI Portfolio</title>
+
+    <!-- Strukturisani podaci (Google / Bing) — statički u HTML jer ne zavisi od React state-a -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Z. Mijailović",
+        "honorificPrefix": "Prof. Dr",
+        "jobTitle": "Cardiologist",
+        "description": "MD, PhD, FACC, ARDMS — cardiology, artificial intelligence, evidence-based medicine.",
+        "url": "https://www.mdzdravko.com/",
+        "sameAs": [
+          "https://www.linkedin.com/in/medexnews-evidence-based-personalized-cardiology-7063b079"
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -1,9 +1,22 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaEnvelope, FaPaperPlane, FaCloudUploadAlt, FaCheckCircle, FaInfoCircle } from 'react-icons/fa';
+import { FaEnvelope, FaCloudUploadAlt, FaCheckCircle, FaInfoCircle } from 'react-icons/fa';
 
 const Contact = () => {
-  const myEmail = "mdzdravko@gmail.com";
+  // mailto: i dalje koristi pravi mejl (korisnik otvara klijenta); to nije isto što i FormSubmit endpoint.
+  const myEmail = 'mdzdravko@gmail.com';
+
+  /**
+   * FormSubmit — ODLUKA (odstupanje od “zlatnog standarda” sa golim mejlom u URL-u):
+   * Ranije je AJAX išao na `https://formsubmit.co/ajax/${myEmail}`. FormSubmit savetuje da se umesto
+   * “golog” mejla u action/URL koristi jedinstveni hash iz aktivacionog mejla, da skreperi ne bi
+   * pokupili adresu iz koda. Isti endpoint radi: https://formsubmit.co/ajax/<hash>
+   * Možeš rotirati ključ preko VITE_FORMSUBMIT_ID u .env / Vercel.
+   */
+  const formSubmitId =
+    (import.meta.env.VITE_FORMSUBMIT_ID || '9ef527932da0d9ce7f458f4a9e74ec93').trim();
+  const formSubmitAjaxUrl = `https://formsubmit.co/ajax/${formSubmitId}`;
+
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSending, setIsSending] = useState(false);
 
@@ -12,9 +25,9 @@ const Contact = () => {
     setIsSending(true);
     const formData = new FormData(e.target);
     try {
-      const response = await fetch(`https://formsubmit.co/ajax/${myEmail}`, {
-        method: "POST",
-        body: formData
+      const response = await fetch(formSubmitAjaxUrl, {
+        method: 'POST',
+        body: formData,
       });
       if (response.ok) setIsSubmitted(true);
     } catch (err) {

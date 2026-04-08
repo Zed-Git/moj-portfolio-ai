@@ -112,30 +112,42 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Overlay navigacija: iznad sadržaja; z-index iznad ProjectDetails modala (z-100) */}
+      {/* Mobilni meni: drawer sa desne strane — levo zatamnjenje, linkovi uz desnu ivicu (ne preko centra slike). */}
       {menuOpen ? (
         <div
-          id="mobile-nav-panel"
-          className="fixed inset-0 z-200 md:hidden flex flex-col bg-[#03040b]/98 backdrop-blur-xl pt-24 px-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Site navigation"
+          className="fixed inset-0 z-200 md:hidden"
+          role="presentation"
         >
-          <nav className="flex flex-col gap-6 text-center" aria-label="Mobile main">
-            {navItems.map(({ href, label }) => (
-              <a
-                key={href}
-                href={href}
-                className="text-lg font-black uppercase tracking-widest text-white/90 py-3 border-b border-white/10 hover:text-cyan-400 transition-colors"
-                onClick={() => setMenuOpen(false)}
-              >
-                {label}
-              </a>
-            ))}
-          </nav>
-          <p className="mt-auto text-center text-[10px] text-white/30 uppercase tracking-widest pb-6">
-            Z. Mijailović · Portfolio
-          </p>
+          {/* Klik van panela zatvara meni */}
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/65 backdrop-blur-[2px]"
+            onClick={() => setMenuOpen(false)}
+            aria-label="Close menu overlay"
+          />
+          <div
+            id="mobile-nav-panel"
+            className="absolute top-0 right-0 flex h-full w-[min(88vw,19rem)] flex-col border-l border-cyan-500/20 bg-[#03040b]/98 shadow-[-12px_0_40px_rgba(0,0,0,0.45)] backdrop-blur-xl pt-[max(5.5rem,env(safe-area-inset-top))] pl-3 pr-[max(1rem,env(safe-area-inset-right))] pb-[max(1rem,env(safe-area-inset-bottom))]"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Site navigation"
+          >
+            <nav className="flex flex-col items-end gap-0 text-right" aria-label="Mobile main">
+              {navItems.map(({ href, label }) => (
+                <a
+                  key={href}
+                  href={href}
+                  className="w-full py-3.5 pl-2 text-lg font-black uppercase tracking-widest text-white/90 border-b border-white/10 hover:text-cyan-400 transition-colors"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {label}
+                </a>
+              ))}
+            </nav>
+            <p className="mt-auto pt-8 text-right text-[10px] text-white/30 uppercase tracking-widest">
+              Z. Mijailović · Portfolio
+            </p>
+          </div>
         </div>
       ) : null}
     </header>

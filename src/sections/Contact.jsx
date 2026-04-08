@@ -29,10 +29,21 @@ const Contact = () => {
         method: 'POST',
         body: formData,
       });
-      if (response.ok) setIsSubmitted(true);
+      const text = await response.text();
+      let data = null;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        /* FormSubmit ponekad vraća prazan ili ne-JSON telo */
+      }
+      if (!response.ok) {
+        const msg = data?.message || data?.error || text || response.statusText;
+        throw new Error(msg || 'Request failed');
+      }
+      setIsSubmitted(true);
     } catch (err) {
-      console.error("Submission failed:", err); // Iskoristili smo 'err' varijablu
-      alert("Error transmitting message.");
+      console.error('Submission failed:', err);
+      alert('Error transmitting message. Please try again or use Open Email Client.');
     } finally {
       setIsSending(false);
     }
@@ -62,6 +73,31 @@ const Contact = () => {
                 onSubmit={handleSubmit}
                 className="space-y-6 text-left w-full"
               >
+                {/*
+                  FormSubmit skrivena polja (dokumentacija formsubmit.co):
+                  - _template "table" = uredniji HTML mejl (tabela polja) umesto "golog" basic teksta.
+                  - _subject = predmet poruke u tvom inboxu.
+                  - _replyto = vrednost "email" znači: koristi polje name="email" za Reply-To (odgovaraš posetiocu jednim klikom).
+                  - _honey = honeypot protiv botova (mora ostati prazan).
+                  Napomena: čist AJAX fetch retko prikazuje Google reCAPTCHA u UI — FormSubmit i dalje filtrira spam na serveru;
+                  jednokratna aktivacija forme ("Activate Form") je već urađena mejlom od FormSubmit.
+                */}
+                <input
+                  type="hidden"
+                  name="_subject"
+                  value="New contact — Z. Mijailović Portfolio (mdzdravko.com)"
+                />
+                <input type="hidden" name="_template" value="table" />
+                <input type="hidden" name="_replyto" value="email" />
+                <input
+                  type="text"
+                  name="_honey"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  className="absolute h-px w-px overflow-hidden opacity-0 -z-10 pointer-events-none"
+                  aria-hidden="true"
+                />
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <input type="text" name="name" placeholder="Full Name" required className="w-full bg-[#0f172a] border border-slate-800 p-5 rounded-2xl outline-none focus:border-cyan-500 transition-all font-bold text-sm" />
                   <input type="email" name="email" placeholder="Email" required className="w-full bg-[#0f172a] border border-slate-800 p-5 rounded-2xl outline-none focus:border-cyan-500 transition-all font-bold text-sm" />
@@ -83,6 +119,11 @@ const Contact = () => {
                     <FaEnvelope /> Open Email Client
                   </a>
                 </div>
+
+                <p className="text-[10px] text-slate-500 leading-relaxed text-center uppercase tracking-tighter">
+                  Delivered via FormSubmit (spam filtering). Email notifications use a structured layout; activation was a
+                  one-time step from FormSubmit.
+                </p>
 
                 <button type="submit" disabled={isSending} className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-black py-5 rounded-2xl transition-all uppercase tracking-widest shadow-xl disabled:opacity-50">
                   {isSending ? "TRANSMITTING..." : "Send Message"}

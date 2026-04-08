@@ -53,11 +53,7 @@ const Header = () => {
   return (
     <header
       ref={headerRef}
-      // NAMERNO (odstupanje): kada je mobilni meni otvoren, header postaje potpuno neproziran,
-      // da se drawer/overlay ispod NE vidi kroz njega (to je bilo “tamno polje” preko ikonica).
-      className={`fixed top-0 left-0 w-full z-100 ${
-        menuOpen ? 'bg-[#03040b]' : 'bg-[#03040b]/80 backdrop-blur-xl'
-      } border-b border-white/5 py-4 px-4 sm:px-6 md:px-16 flex justify-between items-center shadow-2xl`}
+      className="fixed top-0 left-0 w-full z-100 bg-[#03040b]/80 backdrop-blur-xl border-b border-white/5 py-4 px-4 sm:px-6 md:px-16 flex justify-between items-center shadow-2xl"
     >
       <a href="/#home" className="flex min-h-11 items-center gap-3 hover:opacity-80 transition-all font-sans shrink-0">
         <div className="w-10 h-10 rounded-full border border-cyan-500/30 overflow-hidden shadow-[0_0_15px_rgba(6,182,212,0.2)]">
@@ -135,12 +131,10 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Mobilni meni: drawer sa desne strane — levo zatamnjenje, linkovi uz desnu ivicu (ne preko centra slike). */}
+      {/* Mobilni meni: drawer desno — bez tamne plohe (ranije bg-[#03040b]/98); samo staklo + ivica. */}
       {menuOpen ? (
         <div
-          // NAMERNO (odstupanje od “full-screen” overlay standarda):
-          // Header (logo + status bar prostor) ostaje iznad menija, pa overlay počinje ispod headera.
-          // Ovo sprečava da se logo/status linija “potpuno zasene” kada se meni otvori.
+          // Overlay sloj ispod headera; bez boje pozadine. Drawer je “staklo”, ne crna ploha.
           className="fixed inset-0 z-90 md:hidden"
           role="presentation"
         >
@@ -161,7 +155,7 @@ const Header = () => {
               top: `calc(${headerHeightPx}px + env(safe-area-inset-top))`,
               height: `calc(100% - (${headerHeightPx}px + env(safe-area-inset-top)))`,
             }}
-            className="absolute right-0 flex w-[min(88vw,19rem)] flex-col border-l border-cyan-500/20 bg-[#03040b]/98 shadow-[-12px_0_40px_rgba(0,0,0,0.45)] backdrop-blur-xl pt-10 pl-3 pr-[max(1rem,env(safe-area-inset-right))] pb-[max(1rem,env(safe-area-inset-bottom))]"
+            className="absolute right-0 flex w-[min(76vw,17rem)] flex-col border-l border-cyan-400/35 bg-white/[0.07] backdrop-blur-2xl pt-10 pl-3 pr-[max(1rem,env(safe-area-inset-right))] pb-[max(1rem,env(safe-area-inset-bottom))] shadow-none"
             role="dialog"
             aria-modal="true"
             aria-label="Site navigation"
@@ -171,7 +165,7 @@ const Header = () => {
                 <a
                   key={href}
                   href={href}
-                  className="w-full py-3.5 pl-2 text-lg font-black uppercase tracking-widest text-white/90 border-b border-white/10 hover:text-cyan-400 transition-colors"
+                  className="w-full py-3.5 pl-2 text-lg font-black uppercase tracking-widest text-white border-b border-white/15 hover:text-cyan-300 transition-colors [text-shadow:0_1px_3px_rgba(0,0,0,0.85)]"
                   onClick={() => setMenuOpen(false)}
                 >
                   {label}

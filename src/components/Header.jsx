@@ -115,19 +115,22 @@ const Header = () => {
       {/* Mobilni meni: drawer sa desne strane — levo zatamnjenje, linkovi uz desnu ivicu (ne preko centra slike). */}
       {menuOpen ? (
         <div
-          className="fixed inset-0 z-200 md:hidden"
+          // NAMERNO (odstupanje od “full-screen” overlay standarda):
+          // Header (logo + status bar prostor) ostaje iznad menija, pa overlay počinje ispod headera.
+          // Ovo sprečava da se logo/status linija “potpuno zasene” kada se meni otvori.
+          className="fixed inset-0 z-[90] md:hidden"
           role="presentation"
         >
           {/* Klik van panela zatvara meni */}
           <button
             type="button"
-            className="absolute inset-0 bg-black/65 backdrop-blur-[2px]"
+            className="absolute left-0 right-0 bottom-0 top-[max(4.5rem,env(safe-area-inset-top))] bg-black/65 backdrop-blur-[2px]"
             onClick={() => setMenuOpen(false)}
             aria-label="Close menu overlay"
           />
           <div
             id="mobile-nav-panel"
-            className="absolute top-0 right-0 flex h-full w-[min(88vw,19rem)] flex-col border-l border-cyan-500/20 bg-[#03040b]/98 shadow-[-12px_0_40px_rgba(0,0,0,0.45)] backdrop-blur-xl pt-[max(5.5rem,env(safe-area-inset-top))] pl-3 pr-[max(1rem,env(safe-area-inset-right))] pb-[max(1rem,env(safe-area-inset-bottom))]"
+            className="absolute right-0 top-[max(4.5rem,env(safe-area-inset-top))] flex h-[calc(100%-max(4.5rem,env(safe-area-inset-top)))] w-[min(88vw,19rem)] flex-col border-l border-cyan-500/20 bg-[#03040b]/98 shadow-[-12px_0_40px_rgba(0,0,0,0.45)] backdrop-blur-xl pt-10 pl-3 pr-[max(1rem,env(safe-area-inset-right))] pb-[max(1rem,env(safe-area-inset-bottom))]"
             role="dialog"
             aria-modal="true"
             aria-label="Site navigation"

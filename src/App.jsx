@@ -1,6 +1,7 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { trackPageView } from './analytics';
 import Header from './components/Header';
 import About from './sections/About';
 import Projects from './sections/Projects';
@@ -82,6 +83,20 @@ const Home = () => (
   </motion.main>
 );
 
+/**
+ * RouteTracker — pratimo promene stranica u React Router SPA.
+ * GA4 ne vidi history.pushState automatski; ovaj mali komponent
+ * šalje page_view event svaki put kad se ruta promeni.
+ * Mora biti UNUTAR <Router> da useLocation() radi.
+ */
+function RouteTracker() {
+  const location = useLocation();
+  useEffect(() => {
+    trackPageView(location.pathname + location.search, document.title);
+  }, [location]);
+  return null;
+}
+
 function App() {
   return (
     <Router>
@@ -92,6 +107,7 @@ function App() {
         </div>
 
         <div className="relative z-10 px-4">
+          <RouteTracker />
           <Header />
           <Routes>
             <Route path="/" element={<Home />} />

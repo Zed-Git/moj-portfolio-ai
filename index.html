@@ -49,6 +49,15 @@
     <link rel="dns-prefetch" href="https://ldmsmdcprrxetcpraime.supabase.co" />
 
     <!--
+      Google Analytics 4 (GA4) — preconnect sprema mrežu za Google servere pre nego što skript stigne.
+      Sami skriptovi se učitavaju ispod, samo ako je VITE_GA_ID definisan na Vercelu.
+    -->
+    <link rel="preconnect" href="https://www.googletagmanager.com" />
+    <link rel="preconnect" href="https://www.google-analytics.com" />
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+    <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+
+    <!--
       ODLUKA (odstupanje od Vite “zlatnog standarda”):
       - Podrazumevani Vite template koristi /vite.svg kao favicon — zamenjeno je sa /favicon.svg
         da kartica u pregledaču i obeleživači prikazuju ikonicu u stilu tvog portfolija (boje + EKG motiv).
@@ -57,6 +66,43 @@
         Zbog SPA rewrite pravila na Vercelu, /favicon.ico je vraćao index.html umesto slike — zato je u
         vercel.json dodat redirect sa favicon.ico na favicon.svg (vidi taj fajl).
     -->
+    <!--
+      Google Analytics 4 — ODLUKA (odstupanje od "zlatnog standarda"):
+      Ključ (Measurement ID, npr. G-XXXXXXXXXX) dolazi iz Vercel → Settings → Environment Variables
+      pod nazivom VITE_GA_ID. Vite zamenjuje %VITE_GA_ID% vrednosti pri BUILD-u (ne u runtime-u).
+
+      Zaštita: ako VITE_GA_ID nije postavljen, vrednost ostaje literalna string "%VITE_GA_ID%" —
+      tada if(!id || id.includes('VITE_')) preskače GA učitavanje potpuno (ne šalje podatke).
+      Tako lokalni razvoj i preview bez ključa rade normalno bez grešaka u konzoli.
+
+      SPA praćenje stranica: React Router koristi history.pushState bez reload-a, pa GA4 ne bi
+      automatski pratio prelaske između sekcija — za to je u App.jsx dodat useEffect hook koji
+      šalje page_view event pri svakoj promeni rute.
+    -->
+    <script>
+      (function () {
+        var id = '%VITE_GA_ID%';
+        // Ako env var nije definisan u Vite build-u, preskačemo inicijalizaciju
+        if (!id || id.indexOf('VITE_') !== -1) return;
+
+        // Postavljamo gtag helper pre nego što se async skript učita
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { window.dataLayer.push(arguments); }
+        window.gtag = gtag;
+        gtag('js', new Date());
+        gtag('config', id, {
+          send_page_view: false, // SPA: page_view šaljemo ručno iz App.jsx na promenu rute
+          anonymize_ip: true     // Dobra praksa (GDPR)
+        });
+
+        // Asinhron: ne blokira render stranice
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://www.googletagmanager.com/gtag/js?id=' + id;
+        document.head.appendChild(s);
+      })();
+    </script>
+
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" sizes="any" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
     <title>Z. Mijailović | Cardiology &amp; AI Portfolio</title>

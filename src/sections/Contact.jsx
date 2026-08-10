@@ -7,11 +7,12 @@ const Contact = () => {
   // mailto: i dalje koristi pravi mejl (korisnik otvara klijenta); to nije isto što i FormSubmit endpoint.
   const myEmail = 'mdzdravko@gmail.com';
 
-  /**
-   * FormSubmit — hash iz aktivacionog mejla; server (api/contact.js) prosleđuje poruke.
-   * Možeš rotirati ključ preko VITE_FORMSUBMIT_ID na Vercelu.
-   */
+  // Turnstile — javni site key; secret verifikacija ide preko /api/contact.
   const siteKey = import.meta.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+  // FormSubmit hash — šalje se iz browsera (FormSubmit blokira server-side zahteve sa Vercel-a).
+  const formSubmitId =
+    import.meta.env.VITE_FORMSUBMIT_ID?.trim() ||
+    '9ef527932da0d9ce7f458f4a9e74ec93';
 
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSending, setIsSending] = useState(false);
@@ -38,29 +39,66 @@ const Contact = () => {
     }
 
     try {
-      const response = await fetch('/api/contact', {
+      // 1) Server proverava Turnstile token (secret key na Vercel-u)
+      const verifyRes = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, message, turnstileToken }),
       });
-      const text = await response.text();
-      let data = null;
+      const verifyText = await verifyRes.text();
+      let verifyData = null;
       try {
-        data = JSON.parse(text);
+        verifyData = JSON.parse(verifyText);
       } catch {
-        /* non-JSON body */
+        /* non-JSON */
       }
-      if (!response.ok) {
-        const serverMsg = data?.error || data?.message;
-        const bodyPreview =
-          serverMsg ||
-          (text && !text.trimStart().startsWith('<') ? text.trim().slice(0, 300) : null);
+      if (!verifyRes.ok) {
         const msg =
-          response.status === 502
-            ? `Email delivery failed (${response.status}): ${bodyPreview || response.statusText}`
-            : bodyPreview || response.statusText;
-        throw new Error(msg || 'Request failed');
+          verifyData?.error ||
+          verifyText.trim().slice(0, 200) ||
+          verifyRes.statusText;
+        throw new Error(msg || 'Security verification failed');
       }
+
+      // 2) FormSubmit iz browsera (server-side proxy vraća 403 Forbidden)
+      const formRes = await fetch(
+        `https://formsubmit.co/ajax/${formSubmitId}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          body: JSON.stringify({
+            name,
+            email,
+            message,
+            _subject: 'New contact — Z. Mijailović Portfolio (mdzdravko.com)',
+            _template: 'table',
+            _replyto: email,
+            _captcha: 'false',
+          }),
+        }
+      );
+      const formText = await formRes.text();
+      let formJson = null;
+      try {
+        formJson = JSON.parse(formText);
+      } catch {
+        /* non-JSON */
+      }
+      const formOk =
+        formRes.ok &&
+        (formJson?.success === true || formJson?.success === 'true');
+      if (!formOk) {
+        const msg =
+          formJson?.message ||
+          formJson?.error ||
+          formText.trim().slice(0, 200) ||
+          formRes.statusText;
+        throw new Error(msg || 'Email delivery failed');
+      }
+
       setIsSubmitted(true);
       setTurnstileToken(null);
       turnstileRef.current?.reset();
@@ -111,7 +149,7 @@ const Contact = () => {
                 className="space-y-6 text-left w-full"
               >
                 {/*
-                  Honeypot (_honey) i FormSubmit meta polja — sada se primenjuju u api/contact.js.
+                  Honeypot (_honey). Turnstile provera → /api/contact; mejl → FormSubmit iz browsera.
                 */}
                 <input
                   type="text"

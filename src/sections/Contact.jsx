@@ -59,7 +59,13 @@ const Contact = () => {
       turnstileRef.current?.reset();
     } catch (err) {
       console.error('Submission failed:', err);
-      alert('Error transmitting message. Please try again or use Open Email Client.');
+      const detail =
+        err instanceof Error && err.message && err.message !== 'Request failed'
+          ? `\n\n${err.message}`
+          : '';
+      alert(
+        `Error transmitting message. Please try again or use Open Email Client.${detail}`
+      );
       setTurnstileToken(null);
       turnstileRef.current?.reset();
     } finally {
@@ -135,6 +141,11 @@ const Contact = () => {
                   Protected by Cloudflare Turnstile; delivered via FormSubmit (spam filtering).
                 </p>
 
+                {/*
+                  Lokalno (vite dev): u Cloudflare Turnstile → widget → Hostnames dodaj
+                  localhost i 127.0.0.1 pored mdzdravko.com / www.mdzdravko.com.
+                  Za lokalni /api/contact koristi `vercel dev`, ne samo `npm run dev`.
+                */}
                 {siteKey ? (
                   <div className="flex justify-center">
                     <Turnstile

@@ -1,52 +1,76 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaEnvelope, FaCloudUploadAlt, FaCheckCircle, FaInfoCircle } from 'react-icons/fa';
+import { Turnstile } from '@marsidev/react-turnstile';
 
 const Contact = () => {
   // mailto: i dalje koristi pravi mejl (korisnik otvara klijenta); to nije isto što i FormSubmit endpoint.
   const myEmail = 'mdzdravko@gmail.com';
 
   /**
-   * FormSubmit — ODLUKA (odstupanje od “zlatnog standarda” sa golim mejlom u URL-u):
-   * Ranije je AJAX išao na `https://formsubmit.co/ajax/${myEmail}`. FormSubmit savetuje da se umesto
-   * “golog” mejla u action/URL koristi jedinstveni hash iz aktivacionog mejla, da skreperi ne bi
-   * pokupili adresu iz koda. Isti endpoint radi: https://formsubmit.co/ajax/<hash>
-   * Možeš rotirati ključ preko VITE_FORMSUBMIT_ID u .env / Vercel.
+   * FormSubmit — hash iz aktivacionog mejla; server (api/contact.js) prosleđuje poruke.
+   * Možeš rotirati ključ preko VITE_FORMSUBMIT_ID na Vercelu.
    */
-  const formSubmitId =
-    (import.meta.env.VITE_FORMSUBMIT_ID || '9ef527932da0d9ce7f458f4a9e74ec93').trim();
-  const formSubmitAjaxUrl = `https://formsubmit.co/ajax/${formSubmitId}`;
+  const siteKey = import.meta.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSending, setIsSending] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState(null);
+  const turnstileRef = useRef(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!turnstileToken) {
+      alert('Please complete the security check.');
+      return;
+    }
+
     setIsSending(true);
     const formData = new FormData(e.target);
+    const name = formData.get('name');
+    const email = formData.get('email');
+    const message = formData.get('message');
+    const honey = formData.get('_honey');
+    if (honey) {
+      setIsSending(false);
+      return;
+    }
+
     try {
-      const response = await fetch(formSubmitAjaxUrl, {
+      const response = await fetch('/api/contact', {
         method: 'POST',
-        body: formData,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, message, turnstileToken }),
       });
       const text = await response.text();
       let data = null;
       try {
         data = JSON.parse(text);
       } catch {
-        /* FormSubmit ponekad vraća prazan ili ne-JSON telo */
+        /* non-JSON body */
       }
       if (!response.ok) {
-        const msg = data?.message || data?.error || text || response.statusText;
+        const msg = data?.error || data?.message || text || response.statusText;
         throw new Error(msg || 'Request failed');
       }
       setIsSubmitted(true);
+      setTurnstileToken(null);
+      turnstileRef.current?.reset();
     } catch (err) {
       console.error('Submission failed:', err);
       alert('Error transmitting message. Please try again or use Open Email Client.');
+      setTurnstileToken(null);
+      turnstileRef.current?.reset();
     } finally {
       setIsSending(false);
     }
+  };
+
+  const handleSendAnother = () => {
+    setIsSubmitted(false);
+    setTurnstileToken(null);
+    turnstileRef.current?.reset();
   };
 
   return (
@@ -74,21 +98,8 @@ const Contact = () => {
                 className="space-y-6 text-left w-full"
               >
                 {/*
-                  FormSubmit skrivena polja (dokumentacija formsubmit.co):
-                  - _template "table" = uredniji HTML mejl (tabela polja) umesto "golog" basic teksta.
-                  - _subject = predmet poruke u tvom inboxu.
-                  - _replyto = vrednost "email" znači: koristi polje name="email" za Reply-To (odgovaraš posetiocu jednim klikom).
-                  - _honey = honeypot protiv botova (mora ostati prazan).
-                  Napomena: čist AJAX fetch retko prikazuje Google reCAPTCHA u UI — FormSubmit i dalje filtrira spam na serveru;
-                  jednokratna aktivacija forme ("Activate Form") je već urađena mejlom od FormSubmit.
+                  Honeypot (_honey) i FormSubmit meta polja — sada se primenjuju u api/contact.js.
                 */}
-                <input
-                  type="hidden"
-                  name="_subject"
-                  value="New contact — Z. Mijailović Portfolio (mdzdravko.com)"
-                />
-                <input type="hidden" name="_template" value="table" />
-                <input type="hidden" name="_replyto" value="email" />
                 <input
                   type="text"
                   name="_honey"
@@ -121,11 +132,30 @@ const Contact = () => {
                 </div>
 
                 <p className="text-[10px] text-slate-500 leading-relaxed text-center uppercase tracking-tighter">
-                  Delivered via FormSubmit (spam filtering). Email notifications use a structured layout; activation was a
-                  one-time step from FormSubmit.
+                  Protected by Cloudflare Turnstile; delivered via FormSubmit (spam filtering).
                 </p>
 
-                <button type="submit" disabled={isSending} className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-black py-5 rounded-2xl transition-all uppercase tracking-widest shadow-xl disabled:opacity-50">
+                {siteKey ? (
+                  <div className="flex justify-center">
+                    <Turnstile
+                      ref={turnstileRef}
+                      siteKey={siteKey}
+                      onSuccess={(token) => setTurnstileToken(token)}
+                      onExpire={() => setTurnstileToken(null)}
+                      onError={() => setTurnstileToken(null)}
+                    />
+                  </div>
+                ) : (
+                  <p className="text-[10px] text-amber-400 text-center uppercase tracking-tighter">
+                    Security widget unavailable (missing NEXT_PUBLIC_TURNSTILE_SITE_KEY).
+                  </p>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={isSending || !turnstileToken || !siteKey}
+                  className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-black py-5 rounded-2xl transition-all uppercase tracking-widest shadow-xl disabled:opacity-50"
+                >
                   {isSending ? "TRANSMITTING..." : "Send Message"}
                 </button>
               </motion.form>
@@ -133,7 +163,7 @@ const Contact = () => {
               <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} className="text-center">
                 <FaCheckCircle size={50} className="mx-auto text-cyan-400 mb-6" />
                 <h3 className="text-2xl font-black uppercase">Message Received</h3>
-                <button onClick={() => setIsSubmitted(false)} className="mt-8 text-[10px] text-cyan-500 font-black uppercase tracking-widest underline">Send another</button>
+                <button onClick={handleSendAnother} className="mt-8 text-[10px] text-cyan-500 font-black uppercase tracking-widest underline">Send another</button>
               </motion.div>
             )}
           </AnimatePresence>

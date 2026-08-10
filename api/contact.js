@@ -69,11 +69,11 @@ export default async function handler(req, res) {
     const formRes = await fetch(`https://formsubmit.co/ajax/${formSubmitId}`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
         Accept: 'application/json',
         'User-Agent': 'mdzdravko-portfolio-contact/1.0',
       },
-      body: JSON.stringify({
+      body: new URLSearchParams({
         name,
         email,
         message,

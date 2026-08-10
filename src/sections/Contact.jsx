@@ -51,7 +51,14 @@ const Contact = () => {
         /* non-JSON body */
       }
       if (!response.ok) {
-        const msg = data?.error || data?.message || text || response.statusText;
+        const serverMsg = data?.error || data?.message;
+        const bodyPreview =
+          serverMsg ||
+          (text && !text.trimStart().startsWith('<') ? text.trim().slice(0, 300) : null);
+        const msg =
+          response.status === 502
+            ? `Email delivery failed (${response.status}): ${bodyPreview || response.statusText}`
+            : bodyPreview || response.statusText;
         throw new Error(msg || 'Request failed');
       }
       setIsSubmitted(true);

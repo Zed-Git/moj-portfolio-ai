@@ -8,9 +8,9 @@ import Projects from './sections/Projects';
 import Contact from './sections/Contact';
 import ProjectDetails from './sections/ProjectDetails';
 import AdminPanel from './sections/AdminPanel'; 
-import bgFlare from './assets/bg-flare.jpg';
-import medicalLogo from './assets/medical-logo.jpg';
-import zdravkoImg from './assets/zdravko1.webp';
+const bgFlare = '/bg-flare.webp';
+const medicalLogo = '/medical-logo.webp';
+const zdravkoImg = '/zdravko1.webp';
 
 const Home = () => (
   /* 1. Ovde koristimo 'motion.main' umesto običnog 'main'. 
@@ -25,7 +25,7 @@ const Home = () => (
       
       {/* POZADINSKI SLOJ */}
       <div className="absolute inset-0 z-0">
-        <img src={medicalLogo} alt="" className="w-full h-full object-cover opacity-10" />
+        <img src={medicalLogo} alt="" width={512} height={512} decoding="async" fetchPriority="low" className="w-full h-full object-cover opacity-10" />
         <div className="absolute inset-0 bg-linear-to-b from-transparent to-[#03040b]"></div>
       </div>
 
@@ -103,7 +103,7 @@ function App() {
       <div id="home" className="relative min-h-screen w-full bg-[#03040b] text-white overflow-x-hidden font-sans">
         {/* Pozadinski efekat preko celog ekrana */}
         <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-          <img src={bgFlare} alt="" className="w-full h-full object-cover opacity-60" />
+          <img src={bgFlare} alt="" width={1920} height={1180} decoding="async" fetchPriority="low" className="w-full h-full object-cover opacity-60" />
         </div>
 
         <div className="relative z-10 px-4">

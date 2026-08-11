@@ -45,6 +45,11 @@
     <meta name="twitter:image" content="https://www.mdzdravko.com/og-image.webp" />
 
     <!-- Brže učitavanje Supabase API-ja (već koristi klijent u aplikaciji) -->
+    <!-- LCP / hero assets — stabilni URL-ovi iz public/ (preload pre React bundle-a) -->
+    <link rel="preload" as="image" href="/zdravko1.webp" type="image/webp" fetchpriority="high" />
+    <link rel="preload" as="image" href="/bg-flare.webp" type="image/webp" fetchpriority="low" />
+    <link rel="preload" as="image" href="/medical-logo.webp" type="image/webp" fetchpriority="low" />
+
     <link rel="preconnect" href="https://ldmsmdcprrxetcpraime.supabase.co" crossorigin />
     <link rel="dns-prefetch" href="https://ldmsmdcprrxetcpraime.supabase.co" />
 

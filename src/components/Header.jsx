@@ -1,6 +1,6 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import medicalLogo from '../assets/medical-logo.jpg';
+const medicalLogo = '/medical-logo.webp';
 import { FaLinkedin, FaXTwitter } from 'react-icons/fa6';
 import { FaBars, FaTimes } from 'react-icons/fa';
 import { getSocialLinks } from '../config/site';
@@ -57,7 +57,7 @@ const Header = () => {
     >
       <a href="/#home" className="flex min-h-11 items-center gap-3 hover:opacity-80 transition-all font-sans shrink-0">
         <div className="w-10 h-10 rounded-full border border-cyan-500/30 overflow-hidden shadow-[0_0_15px_rgba(6,182,212,0.2)]">
-          <img src={medicalLogo} alt="Portfolio logo" className="w-full h-full object-cover" width={40} height={40} />
+          <img src={medicalLogo} alt="Portfolio logo" className="w-full h-full object-cover" width={40} height={40} decoding="async" fetchPriority="low" />
         </div>
         <span className="text-lg sm:text-xl font-black text-white tracking-tighter uppercase">
           Zed <span className="text-cyan-400 font-light text-sm">AI-Portfolio</span>

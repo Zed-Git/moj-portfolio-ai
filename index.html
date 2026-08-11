@@ -86,21 +86,30 @@
         // Ako env var nije definisan ili je prazan, preskačemo inicijalizaciju
         if (!id || id.indexOf('PUBLIC_GA_ID') !== -1) return;
 
-        // Postavljamo gtag helper pre nego što se async skript učita
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { window.dataLayer.push(arguments); }
-        window.gtag = gtag;
-        gtag('js', new Date());
-        gtag('config', id, {
-          send_page_view: false,  // SPA: page_view šaljemo ručno iz App.jsx na promenu rute
-          anonymize_ip: true      // Dobra praksa (GDPR)
-        });
+        function initGA() {
+          // Postavljamo gtag helper pre nego što se async skript učita
+          window.dataLayer = window.dataLayer || [];
+          function gtag() { window.dataLayer.push(arguments); }
+          window.gtag = gtag;
+          gtag('js', new Date());
+          gtag('config', id, {
+            send_page_view: false,  // SPA: page_view šaljemo ručno iz App.jsx na promenu rute
+            anonymize_ip: true      // Dobra praksa (GDPR)
+          });
 
-        // Asinhron: ne blokira render stranice
-        var s = document.createElement('script');
-        s.async = true;
-        s.src = 'https://www.googletagmanager.com/gtag/js?id=' + id;
-        document.head.appendChild(s);
+          // Asinhron: ne blokira render stranice
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = 'https://www.googletagmanager.com/gtag/js?id=' + id;
+          document.head.appendChild(s);
+        }
+
+        // Odloži GA4 dok browser nije idle — manje TBT na initial load
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(initGA, { timeout: 3000 });
+        } else {
+          setTimeout(initGA, 1);
+        }
       })();
     </script>
 

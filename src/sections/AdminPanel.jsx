@@ -12,7 +12,16 @@ import { AnimatePresence } from 'framer-motion';
    Zadržali smo AnimatePresence jer je koristite u return delu.
 */
 
-import { FaTrash, FaCloudUploadAlt, FaLock, FaInfoCircle, FaEdit, FaTimes, FaKey, FaSave } from 'react-icons/fa';
+import {
+  FaTrash,
+  FaCloudUploadAlt,
+  FaLock,
+  FaInfoCircle,
+  FaEdit,
+  FaTimes,
+  FaKey,
+  FaSave,
+} from 'react-icons/fa';
 import AdminAboutEditor from '../components/admin/AdminAboutEditor';
 
 const AdminPanel = () => {

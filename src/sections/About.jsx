@@ -33,7 +33,7 @@ const About = () => {
         </h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-start">
-          <div className="space-y-6 text-blue-100/70 text-base md:text-lg leading-relaxed font-light text-left">
+          <div className="space-y-6 text-blue-100/90 text-base md:text-lg leading-relaxed font-light text-left">
             {loading ? (
               <p className="animate-pulse">Synchronizing metadata...</p>
             ) : (

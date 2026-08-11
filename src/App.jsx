@@ -1,16 +1,26 @@
-import React, { useEffect } from 'react';
+import React, { Suspense, lazy, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { trackPageView } from './analytics';
 import Header from './components/Header';
 import About from './sections/About';
-import Projects from './sections/Projects';
-import Contact from './sections/Contact';
-import ProjectDetails from './sections/ProjectDetails';
-import AdminPanel from './sections/AdminPanel'; 
+
+const Projects = lazy(() => import('./sections/Projects'));
+const Contact = lazy(() => import('./sections/Contact'));
+const ProjectDetailsRoute = lazy(() =>
+  import('./sections/ProjectDetails').then((m) => ({ default: m.ProjectDetailsRoute }))
+);
+const AdminPanel = lazy(() => import('./sections/AdminPanel'));
+
 const bgFlare = '/bg-flare.webp';
 const medicalLogo = '/medical-logo.webp';
 const zdravkoImg = '/zdravko1.webp';
+
+const RouteFallback = () => (
+  <div className="flex min-h-[50vh] items-center justify-center" role="status" aria-label="Loading">
+    <div className="h-8 w-8 animate-spin rounded-full border-2 border-cyan-500/30 border-t-cyan-400" />
+  </div>
+);
 
 const Home = () => (
   /* 1. Ovde koristimo 'motion.main' umesto običnog 'main'. 
@@ -61,7 +71,7 @@ const Home = () => (
           </span>
         </h1>
 
-        <p className="text-lg md:text-xl text-blue-100/80 max-w-3xl mx-auto mb-12 font-light leading-relaxed italic">
+        <p className="text-lg md:text-xl text-blue-100/90 max-w-3xl mx-auto mb-12 font-light leading-relaxed italic">
           "I believe that <span className="text-white font-medium italic underline decoration-cyan-500/50 underline-offset-4">Medicine must evolve</span> from being merely an individual craft or skill into a rigorous science."
         </p>
 
@@ -76,10 +86,14 @@ const Home = () => (
       </div>
     </div>
 
-    {/* Pozivamo ostale sekcije */}
+    {/* Pozivamo ostale sekcije — Projects i Contact ispod fold-a, lazy load */}
     <About />
-    <Projects />
-    <Contact />
+    <Suspense fallback={null}>
+      <Projects />
+    </Suspense>
+    <Suspense fallback={null}>
+      <Contact />
+    </Suspense>
   </motion.main>
 );
 
@@ -109,11 +123,13 @@ function App() {
         <div className="relative z-10 px-4">
           <RouteTracker />
           <Header />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/project/:id" element={<ProjectDetails />} />
-            <Route path="/admin" element={<AdminPanel />} />
-          </Routes>
+          <Suspense fallback={<RouteFallback />}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/project/:id" element={<ProjectDetailsRoute />} />
+              <Route path="/admin" element={<AdminPanel />} />
+            </Routes>
+          </Suspense>
           <footer className="py-16 text-center opacity-30 text-[9px] tracking-[0.6em] uppercase border-t border-white/5">
             Z. Mijailović // 2026 // MD, PhD, FACC, ARDMS - AI
           </footer>

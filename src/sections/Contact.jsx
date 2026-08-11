@@ -135,7 +135,7 @@ const Contact = () => {
         <h2 className="text-4xl font-black uppercase italic mb-4 tracking-tighter">
           Get in <span className="text-cyan-500">Touch</span>
         </h2>
-        <p className="text-slate-500 mb-16 uppercase text-[10px] tracking-[0.4em]">Scientific collaboration & research</p>
+        <p className="text-slate-400 mb-16 uppercase text-[10px] tracking-[0.4em]">Scientific collaboration & research</p>
 
         <div className="min-h-100 flex items-center justify-center">
           <AnimatePresence mode="wait">

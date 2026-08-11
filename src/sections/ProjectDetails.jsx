@@ -1,5 +1,7 @@
-import React from 'react';
-import { motion } from 'framer-motion'; 
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { supabase } from '../supabaseClient';
 
 const ProjectDetails = ({ project, onClose }) => {
   if (!project) return null;
@@ -28,4 +30,31 @@ const ProjectDetails = ({ project, onClose }) => {
     </motion.div>
   );
 };
+
+/** Deep link /project/:id — fetch iz Supabase, isti modal UI. */
+export function ProjectDetailsRoute() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [project, setProject] = useState(null);
+
+  useEffect(() => {
+    if (!id) return;
+    supabase
+      .from('projects')
+      .select('*')
+      .eq('id', id)
+      .maybeSingle()
+      .then(({ data }) => setProject(data ?? null));
+  }, [id]);
+
+  if (!project) return null;
+
+  return (
+    <ProjectDetails
+      project={project}
+      onClose={() => navigate('/#projects')}
+    />
+  );
+}
+
 export default ProjectDetails;

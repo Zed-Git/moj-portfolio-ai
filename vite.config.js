@@ -15,4 +15,31 @@ export default defineConfig({
    * i čini ih dostupnim u JS kodu (import.meta.env.NEXT_PUBLIC_GA_ID).
    */
   envPrefix: ['VITE_', 'NEXT_PUBLIC_'],
+
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return;
+
+          if (
+            id.includes('node_modules/react/') ||
+            id.includes('node_modules/react-dom') ||
+            id.includes('node_modules/react-router')
+          ) {
+            return 'vendor-react';
+          }
+          if (id.includes('framer-motion')) {
+            return 'vendor-motion';
+          }
+          if (id.includes('@supabase')) {
+            return 'vendor-supabase';
+          }
+          if (id.includes('@marsidev/react-turnstile')) {
+            return 'vendor-turnstile';
+          }
+        },
+      },
+    },
+  },
 });

@@ -1,4 +1,5 @@
 import React, { useEffect, useLayoutEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useLocation } from 'react-router-dom';
 const medicalLogo = '/medical-logo.webp';
 import { FaLinkedin, FaXTwitter } from 'react-icons/fa6';
@@ -135,44 +136,47 @@ const Header = () => {
       </div>
     </header>
 
-      {menuOpen ? (
-        <div
-          className="fixed inset-0 z-90 md:hidden pointer-events-none"
-          role="presentation"
-          aria-hidden={!menuOpen}
-        >
-          <button
-            type="button"
-            className="absolute inset-0 pointer-events-auto bg-black/40 touch-manipulation"
-            onClick={closeMenu}
-            aria-label="Close menu overlay"
-          />
-          <div
-            id="mobile-nav-panel"
-            style={{ paddingTop: `${headerHeightPx}px` }}
-            className="absolute top-0 right-0 bottom-0 w-72 max-w-[80vw] pointer-events-auto bg-[#0f172a]/95 border-l border-white/10 flex flex-col pl-3 pr-[max(1rem,env(safe-area-inset-right))] pb-[max(1rem,env(safe-area-inset-bottom))] touch-manipulation"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Site navigation"
-          >
-            <nav className="flex flex-col items-end gap-0 text-right" aria-label="Mobile main">
-              {navItems.map(({ href, label }) => (
-                <a
-                  key={href}
-                  href={href}
-                  className="w-full py-3.5 pl-2 text-lg font-black uppercase tracking-widest text-white border-b border-white/15 hover:text-cyan-300 transition-colors [text-shadow:0_1px_3px_rgba(0,0,0,0.85)]"
-                  onClick={closeMenu}
-                >
-                  {label}
-                </a>
-              ))}
-            </nav>
-            <p className="mt-auto pt-8 text-right text-[10px] text-white/30 uppercase tracking-widest">
-              Z. Mijailović · Portfolio
-            </p>
-          </div>
-        </div>
-      ) : null}
+      {menuOpen
+        ? createPortal(
+            <div
+              className="fixed inset-0 z-90 h-dvh w-full overscroll-none md:hidden"
+              role="presentation"
+              aria-hidden={!menuOpen}
+            >
+              <button
+                type="button"
+                className="fixed inset-0 h-dvh w-full bg-black/40 touch-manipulation"
+                onClick={closeMenu}
+                aria-label="Close menu overlay"
+              />
+              <div
+                id="mobile-nav-panel"
+                style={{ paddingTop: `${headerHeightPx}px` }}
+                className="fixed top-0 right-0 z-10 h-dvh w-72 max-w-[80vw] overflow-y-auto overscroll-contain bg-[#0f172a]/95 border-l border-white/10 flex flex-col pl-3 pr-[max(1rem,env(safe-area-inset-right))] pb-[max(1rem,env(safe-area-inset-bottom))] touch-manipulation"
+                role="dialog"
+                aria-modal="true"
+                aria-label="Site navigation"
+              >
+                <nav className="flex flex-col items-end gap-0 text-right" aria-label="Mobile main">
+                  {navItems.map(({ href, label }) => (
+                    <a
+                      key={href}
+                      href={href}
+                      className="w-full py-3.5 pl-2 text-lg font-black uppercase tracking-widest text-white border-b border-white/15 hover:text-cyan-300 transition-colors [text-shadow:0_1px_3px_rgba(0,0,0,0.85)]"
+                      onClick={closeMenu}
+                    >
+                      {label}
+                    </a>
+                  ))}
+                </nav>
+                <p className="mt-auto pt-8 text-right text-[10px] text-white/30 uppercase tracking-widest">
+                  Z. Mijailović · Portfolio
+                </p>
+              </div>
+            </div>,
+            document.body
+          )
+        : null}
     </>
   );
 };

@@ -1,13 +1,43 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 const MobileMenuContext = createContext(null);
 
+function lockBodyScroll() {
+  const scrollY = window.scrollY;
+  const { body, documentElement } = document;
+
+  body.dataset.scrollLockY = String(scrollY);
+  body.style.overflow = 'hidden';
+  body.style.position = 'fixed';
+  body.style.top = `-${scrollY}px`;
+  body.style.left = '0';
+  body.style.right = '0';
+  body.style.width = '100%';
+  documentElement.style.overflow = 'hidden';
+}
+
+function unlockBodyScroll() {
+  const { body, documentElement } = document;
+  const scrollY = Number(body.dataset.scrollLockY || '0');
+
+  body.style.overflow = '';
+  body.style.position = '';
+  body.style.top = '';
+  body.style.left = '';
+  body.style.right = '';
+  body.style.width = '';
+  delete body.dataset.scrollLockY;
+  documentElement.style.overflow = '';
+
+  window.scrollTo(0, scrollY);
+}
+
 export function MobileMenuProvider({ children }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const scrollLockedRef = useRef(false);
 
   const closeMenu = useCallback(() => {
     setMenuOpen(false);
-    document.body.style.overflow = '';
   }, []);
 
   const toggleMenu = useCallback(() => {
@@ -15,9 +45,31 @@ export function MobileMenuProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = menuOpen ? 'hidden' : '';
+    if (!menuOpen) {
+      if (scrollLockedRef.current) {
+        unlockBodyScroll();
+        scrollLockedRef.current = false;
+      }
+      return undefined;
+    }
+
+    lockBodyScroll();
+    scrollLockedRef.current = true;
+
+    const preventBackgroundScroll = (event) => {
+      const panel = document.getElementById('mobile-nav-panel');
+      if (panel?.contains(event.target)) return;
+      event.preventDefault();
+    };
+
+    document.addEventListener('touchmove', preventBackgroundScroll, { passive: false });
+
     return () => {
-      document.body.style.overflow = '';
+      document.removeEventListener('touchmove', preventBackgroundScroll);
+      if (scrollLockedRef.current) {
+        unlockBodyScroll();
+        scrollLockedRef.current = false;
+      }
     };
   }, [menuOpen]);
 

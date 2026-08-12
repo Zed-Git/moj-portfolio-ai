@@ -16,7 +16,7 @@ const navItems = [
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const headerRef = useRef(null);
-  const [headerHeightPx, setHeaderHeightPx] = useState(72); // fallback ~ 4.5rem
+  const [headerHeightPx, setHeaderHeightPx] = useState(88); // fallback pre merenja (safe-area + padding)
   const location = useLocation();
   const { linkedin, x } = getSocialLinks();
 
@@ -47,15 +47,21 @@ const Header = () => {
     return () => window.removeEventListener('resize', update);
   }, []);
 
-  const socialClass =
+  const socialClassDesktop =
     'flex min-h-11 min-w-11 items-center justify-center rounded-xl text-white/40 transition-colors hover:bg-white/5 hover:text-cyan-400';
+
+  const socialClassTouch =
+    'flex min-h-12 min-w-12 items-center justify-center rounded-xl text-white/40 transition-colors hover:bg-white/5 hover:text-cyan-400 active:bg-white/10';
+
+  const menuButtonClass =
+    'min-h-12 min-w-12 flex items-center justify-center rounded-xl text-white/80 hover:bg-white/10 hover:text-cyan-400 active:bg-white/15 transition-colors';
 
   return (
     <header
       ref={headerRef}
-      className="fixed top-0 left-0 w-full z-100 bg-[#03040b]/80 backdrop-blur-xl border-b border-white/5 py-4 px-4 sm:px-6 md:px-16 flex justify-between items-center shadow-2xl"
+      className="fixed top-0 left-0 w-full z-100 bg-[#03040b]/80 backdrop-blur-xl border-b border-white/5 px-4 sm:px-6 md:px-16 flex justify-between items-center shadow-2xl pt-[calc(env(safe-area-inset-top,0px)+1rem)] pb-4 md:pt-[calc(env(safe-area-inset-top,0px)+1.25rem)] md:pb-5 lg:pt-[calc(env(safe-area-inset-top,0px)+1.5rem)]"
     >
-      <a href="/#home" className="flex min-h-11 items-center gap-3 hover:opacity-80 transition-all font-sans shrink-0">
+      <a href="/#home" className="flex min-h-12 md:min-h-11 items-center gap-3 hover:opacity-80 transition-all font-sans shrink-0">
         <div className="w-10 h-10 rounded-full border border-cyan-500/30 overflow-hidden shadow-[0_0_15px_rgba(6,182,212,0.2)]">
           <img src={medicalLogo} alt="Portfolio logo" className="w-full h-full object-cover" width={40} height={40} decoding="async" fetchPriority="low" />
         </div>
@@ -81,7 +87,7 @@ const Header = () => {
               href={linkedin}
               target="_blank"
               rel="noopener noreferrer"
-              className={socialClass}
+              className={socialClassDesktop}
               aria-label="LinkedIn profile"
             >
               <FaLinkedin className="text-xl" aria-hidden />
@@ -90,7 +96,7 @@ const Header = () => {
               href={x}
               target="_blank"
               rel="noopener noreferrer"
-              className={socialClass}
+              className={socialClassDesktop}
               aria-label="X (Twitter) profile"
             >
               <FaXTwitter className="text-xl" aria-hidden />
@@ -99,12 +105,12 @@ const Header = () => {
         </nav>
 
         {/* Mobilni: ikone društvenih mreža u traci + hamburger (nevidljiv na md+) */}
-        <div className="flex md:hidden items-center gap-1">
+        <div className="flex md:hidden items-center gap-2">
           <a
             href={linkedin}
             target="_blank"
             rel="noopener noreferrer"
-            className={socialClass}
+            className={socialClassTouch}
             aria-label="LinkedIn profile"
           >
             <FaLinkedin className="text-xl" aria-hidden />
@@ -113,14 +119,14 @@ const Header = () => {
             href={x}
             target="_blank"
             rel="noopener noreferrer"
-            className={socialClass}
+            className={socialClassTouch}
             aria-label="X (Twitter) profile"
           >
             <FaXTwitter className="text-xl" aria-hidden />
           </a>
           <button
             type="button"
-            className="min-h-11 min-w-11 flex items-center justify-center rounded-xl text-white/80 hover:bg-white/10 hover:text-cyan-400 transition-colors"
+            className={menuButtonClass}
             onClick={() => setMenuOpen((o) => !o)}
             aria-expanded={menuOpen}
             aria-controls="mobile-nav-panel"
@@ -141,8 +147,8 @@ const Header = () => {
           {/* Klik van panela zatvara meni */}
           <button
             type="button"
-            // Koristimo stvarnu visinu headera (mereno u runtime-u) + safe-area top, da overlay nikad ne pređe preko ikonica.
-            style={{ top: `calc(${headerHeightPx}px + env(safe-area-inset-top))` }}
+            // Visina headera već uključuje safe-area padding (pt-[calc(env(safe-area-inset-top)+…)]).
+            style={{ top: `${headerHeightPx}px` }}
             // BEZ zatamnjenja: korisnik je tražio da se ukloni “tamno polje” potpuno.
             // Ovaj element ostaje samo kao “click-catcher” da klik van drawer-a zatvori meni.
             className="absolute left-0 right-0 bottom-0 bg-transparent"
@@ -152,8 +158,8 @@ const Header = () => {
           <div
             id="mobile-nav-panel"
             style={{
-              top: `calc(${headerHeightPx}px + env(safe-area-inset-top))`,
-              height: `calc(100% - (${headerHeightPx}px + env(safe-area-inset-top)))`,
+              top: `${headerHeightPx}px`,
+              height: `calc(100% - ${headerHeightPx}px)`,
             }}
             className="absolute right-0 flex w-[min(76vw,17rem)] flex-col border-l border-cyan-400/35 bg-white/[0.07] backdrop-blur-2xl pt-10 pl-3 pr-[max(1rem,env(safe-area-inset-right))] pb-[max(1rem,env(safe-area-inset-bottom))] shadow-none"
             role="dialog"

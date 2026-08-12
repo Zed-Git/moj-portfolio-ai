@@ -1,4 +1,4 @@
-import React, { useState, useRef, useLayoutEffect } from 'react';
+import React, { useState, useRef, useLayoutEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaEnvelope, FaCloudUploadAlt, FaCheckCircle, FaInfoCircle } from 'react-icons/fa';
 import { Turnstile } from '@marsidev/react-turnstile';
@@ -17,9 +17,16 @@ const Contact = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState(null);
+  const [turnstileError, setTurnstileError] = useState(false);
+  const [turnstileMountKey, setTurnstileMountKey] = useState(0);
   const [panelMinHeight, setPanelMinHeight] = useState(null);
   const turnstileRef = useRef(null);
   const panelRef = useRef(null);
+
+  const closeMobileMenu = useCallback(() => {
+    window.dispatchEvent(new CustomEvent('close-mobile-menu'));
+    document.body.style.overflow = '';
+  }, []);
 
   // Form → success shrinks content; lock panel height so scroll position stays put.
   useLayoutEffect(() => {
@@ -40,6 +47,7 @@ const Contact = () => {
       return;
     }
 
+    closeMobileMenu();
     setIsSending(true);
     const formData = new FormData(e.target);
     const name = formData.get('name');
@@ -114,8 +122,10 @@ const Contact = () => {
 
       const lockedHeight = panelRef.current?.offsetHeight;
       if (lockedHeight) setPanelMinHeight(lockedHeight);
+      closeMobileMenu();
       setIsSubmitted(true);
       setTurnstileToken(null);
+      setTurnstileError(false);
       turnstileRef.current?.reset();
     } catch (err) {
       console.error('Submission failed:', err);
@@ -127,16 +137,24 @@ const Contact = () => {
         `Error transmitting message. Please try again or use Open Email Client.${detail}`
       );
       setTurnstileToken(null);
+      setTurnstileError(false);
       turnstileRef.current?.reset();
     } finally {
       setIsSending(false);
     }
   };
 
+  const handleTurnstileRetry = () => {
+    setTurnstileError(false);
+    setTurnstileToken(null);
+    setTurnstileMountKey((k) => k + 1);
+  };
+
   const handleSendAnother = () => {
     setIsSubmitted(false);
     setPanelMinHeight(null);
     setTurnstileToken(null);
+    setTurnstileError(false);
     turnstileRef.current?.reset();
   };
 
@@ -166,6 +184,7 @@ const Contact = () => {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onSubmit={handleSubmit}
+                onFocusCapture={closeMobileMenu}
                 className="w-full space-y-6 text-left"
               >
                 {/*
@@ -212,14 +231,41 @@ const Contact = () => {
                   Za lokalni /api/contact koristi `vercel dev`, ne samo `npm run dev`.
                 */}
                 {siteKey ? (
-                  <div className="flex justify-center">
-                    <Turnstile
-                      ref={turnstileRef}
-                      siteKey={siteKey}
-                      onSuccess={(token) => setTurnstileToken(token)}
-                      onExpire={() => setTurnstileToken(null)}
-                      onError={() => setTurnstileToken(null)}
-                    />
+                  <div className="flex w-full flex-col items-center gap-3">
+                    <div className="flex w-full max-w-[304px] justify-center overflow-hidden">
+                      <Turnstile
+                        key={turnstileMountKey}
+                        ref={turnstileRef}
+                        siteKey={siteKey}
+                        size="flexible"
+                        theme="dark"
+                        refreshExpired="auto"
+                        retry="auto"
+                        onSuccess={(token) => {
+                          setTurnstileToken(token);
+                          setTurnstileError(false);
+                        }}
+                        onExpire={() => setTurnstileToken(null)}
+                        onError={() => {
+                          setTurnstileToken(null);
+                          setTurnstileError(true);
+                        }}
+                      />
+                    </div>
+                    {turnstileError ? (
+                      <div className="w-full max-w-md space-y-3 rounded-2xl border border-amber-500/30 bg-amber-500/5 p-4 text-center">
+                        <p className="text-[10px] font-bold uppercase leading-relaxed tracking-tighter text-amber-200">
+                          Security check could not connect. On iPhone, try disabling content blockers or iCloud Private Relay for this site, then retry.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={handleTurnstileRetry}
+                          className="text-[10px] font-black uppercase tracking-widest text-cyan-400 underline"
+                        >
+                          Retry security check
+                        </button>
+                      </div>
+                    ) : null}
                   </div>
                 ) : (
                   <p className="text-[10px] text-amber-400 text-center uppercase tracking-tighter">

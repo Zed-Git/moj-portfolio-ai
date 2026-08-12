@@ -27,6 +27,16 @@ const Header = () => {
   }, [location.pathname]);
 
   useEffect(() => {
+    const closeMenu = () => setMenuOpen(false);
+    window.addEventListener('close-mobile-menu', closeMenu);
+    window.addEventListener('hashchange', closeMenu);
+    return () => {
+      window.removeEventListener('close-mobile-menu', closeMenu);
+      window.removeEventListener('hashchange', closeMenu);
+    };
+  }, []);
+
+  useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : '';
     return () => {
       document.body.style.overflow = '';

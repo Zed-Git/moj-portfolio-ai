@@ -15,6 +15,25 @@ const navItems = [
   { href: '/#contact', label: 'Contact' },
 ];
 
+function getVisualViewportFrame() {
+  const vv = window.visualViewport;
+  if (vv) {
+    return {
+      top: vv.offsetTop,
+      left: vv.offsetLeft,
+      width: vv.width,
+      height: vv.height,
+    };
+  }
+
+  return {
+    top: 0,
+    left: 0,
+    width: window.innerWidth,
+    height: window.innerHeight,
+  };
+}
+
 const Header = () => {
   const { menuOpen, closeMenu, toggleMenu } = useMobileMenu();
   const headerRef = useRef(null);
@@ -47,8 +66,8 @@ const Header = () => {
 
   const [viewportFrame, setViewportFrame] = React.useState(null);
 
-  // Body scroll lock uses position:fixed on body, which makes fixed children of body
-  // span the full document height on iOS. Pin overlay to visualViewport instead.
+  // Body scroll lock uses position:fixed on body, which stretches fixed overlays on iOS.
+  // Pin one shell to visualViewport; keep backdrop + drawer absolute inside it.
   useLayoutEffect(() => {
     if (!menuOpen) {
       setViewportFrame(null);
@@ -56,23 +75,7 @@ const Header = () => {
     }
 
     const syncViewportFrame = () => {
-      const vv = window.visualViewport;
-      if (vv) {
-        setViewportFrame({
-          top: vv.offsetTop,
-          left: vv.offsetLeft,
-          width: vv.width,
-          height: vv.height,
-        });
-        return;
-      }
-
-      setViewportFrame({
-        top: 0,
-        left: 0,
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
+      setViewportFrame(getVisualViewportFrame());
     };
 
     syncViewportFrame();
@@ -88,28 +91,19 @@ const Header = () => {
     };
   }, [menuOpen]);
 
-  const overlayFrameStyle = viewportFrame
+  const activeViewportFrame = menuOpen
+    ? viewportFrame ?? getVisualViewportFrame()
+    : null;
+
+  const overlayShellStyle = activeViewportFrame
     ? {
-        top: viewportFrame.top,
-        left: viewportFrame.left,
-        width: viewportFrame.width,
-        height: viewportFrame.height,
+        position: 'fixed',
+        top: activeViewportFrame.top,
+        left: activeViewportFrame.left,
+        width: activeViewportFrame.width,
+        height: activeViewportFrame.height,
       }
     : undefined;
-
-  const panelWidthPx = viewportFrame
-    ? Math.min(viewportFrame.width * 0.8, 288)
-    : undefined;
-
-  const panelFrameStyle = viewportFrame
-    ? {
-        top: viewportFrame.top,
-        left: viewportFrame.left + viewportFrame.width - panelWidthPx,
-        width: panelWidthPx,
-        height: viewportFrame.height,
-        paddingTop: `${headerHeightPx}px`,
-      }
-    : { paddingTop: `${headerHeightPx}px` };
 
   const socialClassDesktop =
     'flex min-h-11 min-w-11 items-center justify-center rounded-xl text-white/40 transition-colors hover:bg-white/5 hover:text-cyan-400';
@@ -205,21 +199,21 @@ const Header = () => {
       {menuOpen
         ? createPortal(
             <div
-              className="fixed inset-0 z-90 h-dvh w-full overscroll-none md:hidden"
-              style={overlayFrameStyle}
+              className="z-90 overscroll-none md:hidden"
+              style={overlayShellStyle}
               role="presentation"
               aria-hidden={!menuOpen}
             >
               <button
                 type="button"
-                className="absolute inset-0 h-full w-full bg-black/40 touch-manipulation"
+                className="absolute inset-0 bg-black/40 touch-manipulation"
                 onClick={closeMenu}
                 aria-label="Close menu overlay"
               />
               <div
                 id="mobile-nav-panel"
-                style={panelFrameStyle}
-                className="fixed top-0 right-0 z-10 h-dvh w-72 max-w-[80vw] overflow-y-auto overscroll-contain bg-[#0f172a]/95 border-l border-white/10 flex flex-col pl-3 pr-[max(1rem,env(safe-area-inset-right))] pb-[max(1rem,env(safe-area-inset-bottom))] touch-manipulation"
+                style={{ paddingTop: `${headerHeightPx}px` }}
+                className="absolute top-0 right-0 bottom-0 z-10 w-72 max-w-[80vw] overflow-y-auto overscroll-contain bg-[#0f172a]/95 border-l border-white/10 flex flex-col pl-3 pr-[max(1rem,env(safe-area-inset-right))] pb-[max(1rem,env(safe-area-inset-bottom))] touch-manipulation"
                 role="dialog"
                 aria-modal="true"
                 aria-label="Site navigation"

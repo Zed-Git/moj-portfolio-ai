@@ -156,7 +156,7 @@ const Header = () => {
                 <div className="relative pointer-events-auto">
                   <button
                     type="button"
-                    className="absolute inset-0 w-full bg-[#03040b]/18 backdrop-blur-[2px] touch-manipulation"
+                    className="absolute inset-0 w-full bg-[#03040b]/10 backdrop-blur-[2px] touch-manipulation"
                     onClick={closeMenu}
                     aria-label="Close menu overlay"
                   />

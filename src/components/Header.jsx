@@ -45,6 +45,72 @@ const Header = () => {
     return () => window.removeEventListener('resize', update);
   }, []);
 
+  const [viewportFrame, setViewportFrame] = React.useState(null);
+
+  // Body scroll lock uses position:fixed on body, which makes fixed children of body
+  // span the full document height on iOS. Pin overlay to visualViewport instead.
+  useLayoutEffect(() => {
+    if (!menuOpen) {
+      setViewportFrame(null);
+      return undefined;
+    }
+
+    const syncViewportFrame = () => {
+      const vv = window.visualViewport;
+      if (vv) {
+        setViewportFrame({
+          top: vv.offsetTop,
+          left: vv.offsetLeft,
+          width: vv.width,
+          height: vv.height,
+        });
+        return;
+      }
+
+      setViewportFrame({
+        top: 0,
+        left: 0,
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    syncViewportFrame();
+    const vv = window.visualViewport;
+    vv?.addEventListener('resize', syncViewportFrame);
+    vv?.addEventListener('scroll', syncViewportFrame);
+    window.addEventListener('resize', syncViewportFrame);
+
+    return () => {
+      vv?.removeEventListener('resize', syncViewportFrame);
+      vv?.removeEventListener('scroll', syncViewportFrame);
+      window.removeEventListener('resize', syncViewportFrame);
+    };
+  }, [menuOpen]);
+
+  const overlayFrameStyle = viewportFrame
+    ? {
+        top: viewportFrame.top,
+        left: viewportFrame.left,
+        width: viewportFrame.width,
+        height: viewportFrame.height,
+      }
+    : undefined;
+
+  const panelWidthPx = viewportFrame
+    ? Math.min(viewportFrame.width * 0.8, 288)
+    : undefined;
+
+  const panelFrameStyle = viewportFrame
+    ? {
+        top: viewportFrame.top,
+        left: viewportFrame.left + viewportFrame.width - panelWidthPx,
+        width: panelWidthPx,
+        height: viewportFrame.height,
+        paddingTop: `${headerHeightPx}px`,
+      }
+    : { paddingTop: `${headerHeightPx}px` };
+
   const socialClassDesktop =
     'flex min-h-11 min-w-11 items-center justify-center rounded-xl text-white/40 transition-colors hover:bg-white/5 hover:text-cyan-400';
 
@@ -140,18 +206,19 @@ const Header = () => {
         ? createPortal(
             <div
               className="fixed inset-0 z-90 h-dvh w-full overscroll-none md:hidden"
+              style={overlayFrameStyle}
               role="presentation"
               aria-hidden={!menuOpen}
             >
               <button
                 type="button"
-                className="fixed inset-0 h-dvh w-full bg-black/40 touch-manipulation"
+                className="absolute inset-0 h-full w-full bg-black/40 touch-manipulation"
                 onClick={closeMenu}
                 aria-label="Close menu overlay"
               />
               <div
                 id="mobile-nav-panel"
-                style={{ paddingTop: `${headerHeightPx}px` }}
+                style={panelFrameStyle}
                 className="fixed top-0 right-0 z-10 h-dvh w-72 max-w-[80vw] overflow-y-auto overscroll-contain bg-[#0f172a]/95 border-l border-white/10 flex flex-col pl-3 pr-[max(1rem,env(safe-area-inset-right))] pb-[max(1rem,env(safe-area-inset-bottom))] touch-manipulation"
                 role="dialog"
                 aria-modal="true"
@@ -174,7 +241,7 @@ const Header = () => {
                 </p>
               </div>
             </div>,
-            document.body
+            document.documentElement
           )
         : null}
     </>

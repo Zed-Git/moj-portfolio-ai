@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import { motion } from 'framer-motion';
 import { trackPageView } from './analytics';
 import Header from './components/Header';
+import { MobileMenuProvider } from './context/MobileMenuContext';
 import About from './sections/About';
 
 const Projects = lazy(() => import('./sections/Projects'));
@@ -114,6 +115,7 @@ function RouteTracker() {
 function App() {
   return (
     <Router>
+      <MobileMenuProvider>
       <div id="home" className="relative min-h-screen w-full bg-[#03040b] text-white overflow-x-hidden font-sans">
         {/* Pozadinski efekat preko celog ekrana */}
         <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
@@ -135,6 +137,7 @@ function App() {
           </footer>
         </div>
       </div>
+      </MobileMenuProvider>
     </Router>
   );
 }

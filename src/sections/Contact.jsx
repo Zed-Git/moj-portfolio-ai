@@ -1,12 +1,18 @@
-import React, { useState, useRef, useLayoutEffect, useCallback } from 'react';
+import React, { useState, useRef, useLayoutEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaEnvelope, FaCloudUploadAlt, FaCheckCircle, FaInfoCircle } from 'react-icons/fa';
 import { Turnstile } from '@marsidev/react-turnstile';
 import { CONTACT_EMAIL } from '../config/site';
+import { useMobileMenu } from '../context/MobileMenuContext';
 
 const Contact = () => {
   // mailto: i dalje koristi pravi mejl (korisnik otvara klijenta); to nije isto što i FormSubmit endpoint.
   const myEmail = CONTACT_EMAIL;
+  const { closeMenu } = useMobileMenu();
+
+  // 16px min prevents iOS Safari focus-zoom that breaks fixed layout.
+  const inputClass =
+    'w-full max-w-full bg-[#0f172a] border border-slate-800 p-5 rounded-2xl outline-none focus:border-cyan-500 transition-all font-bold text-base';
 
   // Turnstile — javni site key; secret verifikacija ide preko /api/contact.
   const siteKey = import.meta.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
@@ -22,11 +28,6 @@ const Contact = () => {
   const [panelMinHeight, setPanelMinHeight] = useState(null);
   const turnstileRef = useRef(null);
   const panelRef = useRef(null);
-
-  const closeMobileMenu = useCallback(() => {
-    window.dispatchEvent(new CustomEvent('close-mobile-menu'));
-    document.body.style.overflow = '';
-  }, []);
 
   // Form → success shrinks content; lock panel height so scroll position stays put.
   useLayoutEffect(() => {
@@ -47,7 +48,7 @@ const Contact = () => {
       return;
     }
 
-    closeMobileMenu();
+    closeMenu();
     setIsSending(true);
     const formData = new FormData(e.target);
     const name = formData.get('name');
@@ -122,7 +123,7 @@ const Contact = () => {
 
       const lockedHeight = panelRef.current?.offsetHeight;
       if (lockedHeight) setPanelMinHeight(lockedHeight);
-      closeMobileMenu();
+      closeMenu();
       setIsSubmitted(true);
       setTurnstileToken(null);
       setTurnstileError(false);
@@ -163,9 +164,9 @@ const Contact = () => {
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       id="contact"
-      className="scroll-mt-28 pt-24 pb-20 bg-black text-white rounded-b-[60px] md:rounded-b-[100px] mb-12 shadow-2xl relative z-10"
+      className="scroll-mt-28 pt-24 pb-20 bg-black text-white rounded-b-[60px] md:rounded-b-[100px] mb-12 shadow-2xl relative z-10 overflow-x-clip max-w-full"
     >
-      <div className="max-w-4xl mx-auto px-10 text-center">
+      <div className="max-w-4xl mx-auto w-full px-4 sm:px-10 text-center">
         <h2 className="text-4xl font-black uppercase italic mb-4 tracking-tighter">
           Get in <span className="text-cyan-500">Touch</span>
         </h2>
@@ -184,7 +185,7 @@ const Contact = () => {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onSubmit={handleSubmit}
-                onFocusCapture={closeMobileMenu}
+                onFocusCapture={closeMenu}
                 className="w-full space-y-6 text-left"
               >
                 {/*
@@ -200,10 +201,10 @@ const Contact = () => {
                 />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <input type="text" name="name" placeholder="Full Name" required className="w-full bg-[#0f172a] border border-slate-800 p-5 rounded-2xl outline-none focus:border-cyan-500 transition-all font-bold text-sm" />
-                  <input type="email" name="email" placeholder="Email" required className="w-full bg-[#0f172a] border border-slate-800 p-5 rounded-2xl outline-none focus:border-cyan-500 transition-all font-bold text-sm" />
+                  <input type="text" name="name" placeholder="Full Name" required className={inputClass} />
+                  <input type="email" name="email" placeholder="Email" required className={inputClass} />
                 </div>
-                <textarea name="message" rows="5" placeholder="Research proposal..." required className="w-full bg-[#0f172a] border border-slate-800 p-5 rounded-2xl outline-none focus:border-cyan-500 transition-all font-bold text-sm"></textarea>
+                <textarea name="message" rows="5" placeholder="Research proposal..." required className={inputClass}></textarea>
 
                 {/* VRAĆENI NOTE I UPLOAD BOX */}
                 <div className="bg-[#0f172a] border border-dashed border-cyan-500/20 p-8 rounded-3xl text-center">

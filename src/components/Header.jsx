@@ -1,9 +1,10 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 const medicalLogo = '/medical-logo.webp';
 import { FaLinkedin, FaXTwitter } from 'react-icons/fa6';
 import { FaBars, FaTimes } from 'react-icons/fa';
 import { getSocialLinks } from '../config/site';
+import { useMobileMenu } from '../context/MobileMenuContext';
 
 // Koristi /#anchor da radi i sa /project/:id (hash-only bi ostao na istoj ruti bez Home sekcije).
 const navItems = [
@@ -14,41 +15,27 @@ const navItems = [
 ];
 
 const Header = () => {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const { menuOpen, closeMenu, toggleMenu } = useMobileMenu();
   const headerRef = useRef(null);
-  const [headerHeightPx, setHeaderHeightPx] = useState(88); // fallback pre merenja (safe-area + padding)
+  const [headerHeightPx, setHeaderHeightPx] = React.useState(88);
   const location = useLocation();
   const { linkedin, x } = getSocialLinks();
 
   useEffect(() => {
-    // Zatvori mobilni meni pri promeni rute (npr. /project/:id).
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- sinhronizacija UI sa lokacijom nakon navigacije
-    setMenuOpen(false);
-  }, [location.pathname]);
+    closeMenu();
+  }, [location.pathname, closeMenu]);
 
   useEffect(() => {
-    const closeMenu = () => setMenuOpen(false);
-    window.addEventListener('close-mobile-menu', closeMenu);
-    window.addEventListener('hashchange', closeMenu);
-    return () => {
-      window.removeEventListener('close-mobile-menu', closeMenu);
-      window.removeEventListener('hashchange', closeMenu);
-    };
-  }, []);
-
-  useEffect(() => {
-    document.body.style.overflow = menuOpen ? 'hidden' : '';
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [menuOpen]);
+    const onHashChange = () => closeMenu();
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, [closeMenu]);
 
   useLayoutEffect(() => {
     const el = headerRef.current;
     if (!el) return;
 
     const update = () => {
-      // Uzimamo realnu visinu headera (uključuje padding), da overlay/drawer nikad ne “uđu” u njega.
       setHeaderHeightPx(Math.ceil(el.getBoundingClientRect().height));
     };
 
@@ -69,9 +56,9 @@ const Header = () => {
   return (
     <header
       ref={headerRef}
-      className="fixed top-0 left-0 w-full z-100 bg-[#03040b]/80 backdrop-blur-xl border-b border-white/5 px-4 sm:px-6 md:px-16 flex justify-between items-center shadow-2xl pt-[calc(env(safe-area-inset-top,0px)+1rem)] pb-4 md:pt-[calc(env(safe-area-inset-top,0px)+1.25rem)] md:pb-5 lg:pt-[calc(env(safe-area-inset-top,0px)+1.5rem)]"
+      className="fixed top-0 left-0 right-0 z-100 bg-[#03040b]/80 backdrop-blur-xl border-b border-white/5 px-4 sm:px-6 md:px-16 flex justify-between items-center shadow-2xl pt-[calc(env(safe-area-inset-top,0px)+1rem)] pb-4 md:pt-[calc(env(safe-area-inset-top,0px)+1.25rem)] md:pb-5 lg:pt-[calc(env(safe-area-inset-top,0px)+1.5rem)]"
     >
-      <a href="/#home" className="flex min-h-12 md:min-h-11 items-center gap-3 hover:opacity-80 transition-all font-sans shrink-0">
+      <a href="/#home" className="flex min-h-12 md:min-h-11 items-center gap-3 hover:opacity-80 transition-all font-sans shrink-0" onClick={closeMenu}>
         <div className="w-10 h-10 rounded-full border border-cyan-500/30 overflow-hidden shadow-[0_0_15px_rgba(6,182,212,0.2)]">
           <img src={medicalLogo} alt="Portfolio logo" className="w-full h-full object-cover" width={40} height={40} decoding="async" fetchPriority="low" />
         </div>
@@ -114,7 +101,6 @@ const Header = () => {
           </div>
         </nav>
 
-        {/* Mobilni: ikone društvenih mreža u traci + hamburger (nevidljiv na md+) */}
         <div className="flex md:hidden items-center gap-2">
           <a
             href={linkedin}
@@ -137,7 +123,7 @@ const Header = () => {
           <button
             type="button"
             className={menuButtonClass}
-            onClick={() => setMenuOpen((o) => !o)}
+            onClick={toggleMenu}
             aria-expanded={menuOpen}
             aria-controls="mobile-nav-panel"
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
@@ -147,31 +133,26 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Mobilni meni: drawer desno — bez tamne plohe (ranije bg-[#03040b]/98); samo staklo + ivica. */}
       {menuOpen ? (
         <div
-          // Overlay sloj ispod headera; bez boje pozadine. Drawer je “staklo”, ne crna ploha.
-          className="fixed inset-0 z-90 md:hidden"
+          className="fixed inset-0 z-90 md:hidden pointer-events-auto"
           role="presentation"
+          aria-hidden={!menuOpen}
         >
-          {/* Klik van panela zatvara meni */}
           <button
             type="button"
-            // Visina headera već uključuje safe-area padding (pt-[calc(env(safe-area-inset-top)+…)]).
             style={{ top: `${headerHeightPx}px` }}
-            // BEZ zatamnjenja: korisnik je tražio da se ukloni “tamno polje” potpuno.
-            // Ovaj element ostaje samo kao “click-catcher” da klik van drawer-a zatvori meni.
             className="absolute left-0 right-0 bottom-0 bg-transparent"
-            onClick={() => setMenuOpen(false)}
+            onClick={closeMenu}
             aria-label="Close menu overlay"
           />
           <div
             id="mobile-nav-panel"
             style={{
               top: `${headerHeightPx}px`,
-              height: `calc(100% - ${headerHeightPx}px)`,
+              height: `calc(100dvh - ${headerHeightPx}px)`,
             }}
-            className="absolute right-0 flex w-[min(76vw,17rem)] flex-col border-l border-cyan-400/35 bg-white/[0.07] backdrop-blur-2xl pt-10 pl-3 pr-[max(1rem,env(safe-area-inset-right))] pb-[max(1rem,env(safe-area-inset-bottom))] shadow-none"
+            className="absolute right-0 flex w-[min(76vw,17rem)] max-w-full flex-col border-l border-cyan-400/35 bg-white/[0.07] backdrop-blur-2xl pt-10 pl-3 pr-[max(1rem,env(safe-area-inset-right))] pb-[max(1rem,env(safe-area-inset-bottom))] shadow-none"
             role="dialog"
             aria-modal="true"
             aria-label="Site navigation"
@@ -182,7 +163,7 @@ const Header = () => {
                   key={href}
                   href={href}
                   className="w-full py-3.5 pl-2 text-lg font-black uppercase tracking-widest text-white border-b border-white/15 hover:text-cyan-300 transition-colors [text-shadow:0_1px_3px_rgba(0,0,0,0.85)]"
-                  onClick={() => setMenuOpen(false)}
+                  onClick={closeMenu}
                 >
                   {label}
                 </a>

@@ -23,13 +23,14 @@ import {
   FaSave,
 } from 'react-icons/fa';
 import AdminAboutEditor from '../components/admin/AdminAboutEditor';
+import { ADMIN_EMAIL } from '../config/site';
 
 const AdminPanel = () => {
   const [session, setSession] = useState(null);
   const [projekti, setProjekti] = useState([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(ADMIN_EMAIL);
   const [password, setPassword] = useState('');
   const [editingId, setEditingId] = useState(null);
   const [isResettingPassword, setIsResettingPassword] = useState(false);
@@ -163,7 +164,7 @@ const AdminPanel = () => {
             <FaLock size={40} className="mx-auto text-cyan-500 mb-6" />
             <h2 className="text-2xl font-black text-white uppercase mb-8 tracking-tighter italic">Secure Access</h2>
             <form onSubmit={handleLogin} className="space-y-4">
-              <input type="email" placeholder="Admin Email" className="w-full bg-[#1e293b] text-white p-4 rounded-xl outline-none focus:border-cyan-500 transition-all font-bold" value={email} onChange={(e) => setEmail(e.target.value)} />
+              <input type="email" placeholder={ADMIN_EMAIL} autoComplete="username" className="w-full bg-[#1e293b] text-white p-4 rounded-xl outline-none focus:border-cyan-500 transition-all font-bold" value={email} onChange={(e) => setEmail(e.target.value)} />
               <input type="password" placeholder="Key Phrase" className="w-full bg-[#1e293b] text-white p-4 rounded-xl outline-none focus:border-cyan-500 transition-all font-bold" value={password} onChange={(e) => setPassword(e.target.value)} />
               <button className="w-full bg-cyan-500 py-4 rounded-xl font-black uppercase text-black hover:bg-cyan-400 transition-all">Authorize</button>
             </form>
@@ -171,7 +172,7 @@ const AdminPanel = () => {
           </div>
         </div>
       ) : (
-        <div key="dashboard" className="min-h-screen bg-[#020617] text-white p-4 md:p-10 pt-40">
+        <div key="dashboard" className="min-h-screen bg-[#020617] text-white px-4 pb-4 md:px-10 md:pb-10 pt-[calc(env(safe-area-inset-top,0px)+7rem)] md:pt-[calc(env(safe-area-inset-top,0px)+7.5rem)]">
           <div className="max-w-5xl mx-auto">
             <header className="flex justify-between items-center mb-10 bg-slate-900/50 p-6 rounded-3xl border border-white/5 shadow-2xl">
               <h1 className="text-2xl font-black text-cyan-500 uppercase italic tracking-tighter">Control Panel</h1>

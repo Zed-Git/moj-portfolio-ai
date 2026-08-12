@@ -6,8 +6,11 @@
  */
 export const SITE_URL = 'https://www.mdzdravko.com'
 
-/** Profesionalni kontakt mejl (Zoho) — prijem forme, mailto, SEO */
+/** Profesionalni kontakt mejl (Zoho) — prijem forme, mailto, SEO, admin login */
 export const CONTACT_EMAIL = 'hello@mdzdravko.com'
+
+/** Admin panel — isti profesionalni mejl kao kontakt forma */
+export const ADMIN_EMAIL = CONTACT_EMAIL
 
 /** Lični LinkedIn (MD, PhD, RDCS, FACC) */
 const DEFAULT_LINKEDIN =

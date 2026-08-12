@@ -156,13 +156,13 @@ const Header = () => {
                 <div className="relative pointer-events-auto">
                   <button
                     type="button"
-                    className="absolute inset-0 w-full bg-[#03040b]/10 backdrop-blur-[2px] touch-manipulation"
+                    className="absolute inset-0 w-full bg-[#03040b]/06 touch-manipulation"
                     onClick={closeMenu}
                     aria-label="Close menu overlay"
                   />
                   <div
                     id="mobile-nav-panel"
-                    className="relative ml-auto w-72 max-w-[80vw] bg-[#0f172a]/92 border-l border-b border-white/10 flex flex-col pl-3 pr-[max(1rem,env(safe-area-inset-right))] pb-1 touch-manipulation"
+                    className="relative ml-auto w-72 max-w-[80vw] bg-[#0f172a]/75 border-l border-b border-white/10 flex flex-col pl-3 pr-[max(1rem,env(safe-area-inset-right))] pb-1 touch-manipulation"
                     role="dialog"
                     aria-modal="true"
                     aria-label="Site navigation"

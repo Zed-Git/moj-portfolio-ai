@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useLayoutEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaEnvelope, FaCloudUploadAlt, FaCheckCircle, FaInfoCircle } from 'react-icons/fa';
 import { Turnstile } from '@marsidev/react-turnstile';
@@ -17,7 +17,20 @@ const Contact = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState(null);
+  const [panelMinHeight, setPanelMinHeight] = useState(null);
   const turnstileRef = useRef(null);
+  const panelRef = useRef(null);
+
+  // Form → success shrinks content; lock panel height so scroll position stays put.
+  useLayoutEffect(() => {
+    if (!isSubmitted) return;
+    const scrollY = window.scrollY;
+    requestAnimationFrame(() => {
+      if (window.scrollY !== scrollY) {
+        window.scrollTo(0, scrollY);
+      }
+    });
+  }, [isSubmitted]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -99,6 +112,8 @@ const Contact = () => {
         throw new Error(msg || 'Email delivery failed');
       }
 
+      const lockedHeight = panelRef.current?.offsetHeight;
+      if (lockedHeight) setPanelMinHeight(lockedHeight);
       setIsSubmitted(true);
       setTurnstileToken(null);
       turnstileRef.current?.reset();
@@ -120,6 +135,7 @@ const Contact = () => {
 
   const handleSendAnother = () => {
     setIsSubmitted(false);
+    setPanelMinHeight(null);
     setTurnstileToken(null);
     turnstileRef.current?.reset();
   };
@@ -128,8 +144,8 @@ const Contact = () => {
     <motion.section 
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
-      id="contact" 
-      className="pt-24 pb-20 bg-black text-white rounded-b-[60px] md:rounded-b-[100px] mb-12 shadow-2xl relative z-10"
+      id="contact"
+      className="scroll-mt-28 pt-24 pb-20 bg-black text-white rounded-b-[60px] md:rounded-b-[100px] mb-12 shadow-2xl relative z-10"
     >
       <div className="max-w-4xl mx-auto px-10 text-center">
         <h2 className="text-4xl font-black uppercase italic mb-4 tracking-tighter">
@@ -137,16 +153,20 @@ const Contact = () => {
         </h2>
         <p className="text-slate-400 mb-16 uppercase text-[10px] tracking-[0.4em]">Scientific collaboration & research</p>
 
-        <div className="min-h-100 flex items-center justify-center">
+        <div
+          ref={panelRef}
+          className="flex w-full items-center justify-center"
+          style={panelMinHeight != null ? { minHeight: panelMinHeight } : undefined}
+        >
           <AnimatePresence mode="wait">
             {!isSubmitted ? (
-              <motion.form 
+              <motion.form
                 key="form"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onSubmit={handleSubmit}
-                className="space-y-6 text-left w-full"
+                className="w-full space-y-6 text-left"
               >
                 {/*
                   Honeypot (_honey). Turnstile provera → /api/contact; mejl → FormSubmit iz browsera.
@@ -216,7 +236,13 @@ const Contact = () => {
                 </button>
               </motion.form>
             ) : (
-              <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} className="text-center">
+              <motion.div
+                key="success"
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                className="w-full text-center"
+              >
                 <FaCheckCircle size={50} className="mx-auto text-cyan-400 mb-6" />
                 <h3 className="text-2xl font-black uppercase">Message Received</h3>
                 <button onClick={handleSendAnother} className="mt-8 text-[10px] text-cyan-500 font-black uppercase tracking-widest underline">Send another</button>

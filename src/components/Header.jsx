@@ -54,9 +54,10 @@ const Header = () => {
     'min-h-12 min-w-12 flex items-center justify-center rounded-xl text-white/80 hover:bg-white/10 hover:text-cyan-400 active:bg-white/15 transition-colors';
 
   return (
+    <>
     <header
       ref={headerRef}
-      className="fixed top-0 left-0 right-0 z-100 bg-[#03040b]/80 backdrop-blur-xl border-b border-white/5 px-4 sm:px-6 md:px-16 flex justify-between items-center shadow-2xl pt-[calc(env(safe-area-inset-top,0px)+1rem)] pb-4 md:pt-[calc(env(safe-area-inset-top,0px)+1.25rem)] md:pb-5 lg:pt-[calc(env(safe-area-inset-top,0px)+1.5rem)]"
+      className="fixed top-0 left-0 right-0 z-110 bg-[#03040b]/80 backdrop-blur-xl border-b border-white/5 px-4 sm:px-6 md:px-16 flex justify-between items-center shadow-2xl pt-[calc(env(safe-area-inset-top,0px)+1rem)] pb-4 md:pt-[calc(env(safe-area-inset-top,0px)+1.25rem)] md:pb-5 lg:pt-[calc(env(safe-area-inset-top,0px)+1.5rem)]"
     >
       <a href="/#home" className="relative z-110 flex min-h-12 md:min-h-11 items-center gap-3 hover:opacity-80 transition-all font-sans shrink-0 touch-manipulation" onClick={closeMenu}>
         <div className="w-10 h-10 rounded-full border border-cyan-500/30 overflow-hidden shadow-[0_0_15px_rgba(6,182,212,0.2)]">
@@ -132,23 +133,24 @@ const Header = () => {
           </button>
         </div>
       </div>
+    </header>
 
       {menuOpen ? (
         <div
-          className="fixed inset-0 z-90 md:hidden pointer-events-none min-h-dvh"
+          className="fixed inset-0 z-90 md:hidden pointer-events-none"
           role="presentation"
           aria-hidden={!menuOpen}
         >
           <button
             type="button"
-            className="absolute inset-0 bg-[#03040b]/40 backdrop-blur-sm pointer-events-auto touch-manipulation"
+            className="absolute inset-0 pointer-events-auto bg-black/40 touch-manipulation"
             onClick={closeMenu}
             aria-label="Close menu overlay"
           />
           <div
             id="mobile-nav-panel"
-            style={{ paddingTop: `${headerHeightPx + 24}px` }}
-            className="absolute top-0 right-0 bottom-0 flex w-[min(76vw,17rem)] max-w-full flex-col border-l border-white/10 bg-[#0f172a]/80 backdrop-blur-xl pl-3 pr-[max(1rem,env(safe-area-inset-right))] pb-[max(1rem,env(safe-area-inset-bottom))] pointer-events-auto touch-manipulation"
+            style={{ paddingTop: `${headerHeightPx}px` }}
+            className="absolute top-0 right-0 bottom-0 w-72 max-w-[80vw] pointer-events-auto bg-[#0f172a]/95 border-l border-white/10 flex flex-col pl-3 pr-[max(1rem,env(safe-area-inset-right))] pb-[max(1rem,env(safe-area-inset-bottom))] touch-manipulation"
             role="dialog"
             aria-modal="true"
             aria-label="Site navigation"
@@ -171,7 +173,7 @@ const Header = () => {
           </div>
         </div>
       ) : null}
-    </header>
+    </>
   );
 };
 

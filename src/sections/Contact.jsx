@@ -2,17 +2,17 @@ import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaEnvelope, FaCloudUploadAlt, FaCheckCircle, FaInfoCircle } from 'react-icons/fa';
 import { Turnstile } from '@marsidev/react-turnstile';
+import { CONTACT_EMAIL } from '../config/site';
 
 const Contact = () => {
   // mailto: i dalje koristi pravi mejl (korisnik otvara klijenta); to nije isto što i FormSubmit endpoint.
-  const myEmail = 'mdzdravko@gmail.com';
+  const myEmail = CONTACT_EMAIL;
 
   // Turnstile — javni site key; secret verifikacija ide preko /api/contact.
   const siteKey = import.meta.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
-  // FormSubmit hash — šalje se iz browsera (FormSubmit blokira server-side zahteve sa Vercel-a).
+  // FormSubmit — email ili hash iz aktivacionog mejla; šalje se iz browsera.
   const formSubmitId =
-    import.meta.env.VITE_FORMSUBMIT_ID?.trim() ||
-    '9ef527932da0d9ce7f458f4a9e74ec93';
+    import.meta.env.VITE_FORMSUBMIT_ID?.trim() || CONTACT_EMAIL;
 
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSending, setIsSending] = useState(false);

@@ -8,6 +8,9 @@
  */
 export const SITE_URL = 'https://www.mdzdravko.com'
 
+/** Profesionalni kontakt mejl (Zoho) — prijem forme, mailto, SEO */
+export const CONTACT_EMAIL = 'hello@mdzdravko.com'
+
 /** Podrazumevani LinkedIn (MedExNews — evidence-based cardiology); override preko VITE_LINKEDIN_URL */
 const DEFAULT_LINKEDIN =
   'https://www.linkedin.com/in/medexnews-evidence-based-personalized-cardiology-7063b079'

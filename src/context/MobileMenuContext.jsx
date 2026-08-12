@@ -30,7 +30,7 @@ export function MobileMenuProvider({ children }) {
       if (!menuOpen) return;
       const keyboardLikelyOpen = vv.height < window.innerHeight * 0.82;
       if (keyboardLikelyOpen) {
-        setMenuOpen(false);
+        closeMenu();
       }
     };
 
@@ -40,7 +40,7 @@ export function MobileMenuProvider({ children }) {
       vv.removeEventListener('resize', onViewportChange);
       vv.removeEventListener('scroll', onViewportChange);
     };
-  }, [menuOpen]);
+  }, [menuOpen, closeMenu]);
 
   return (
     <MobileMenuContext.Provider value={{ menuOpen, setMenuOpen, closeMenu, toggleMenu }}>

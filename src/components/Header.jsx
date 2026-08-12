@@ -58,7 +58,7 @@ const Header = () => {
       ref={headerRef}
       className="fixed top-0 left-0 right-0 z-100 bg-[#03040b]/80 backdrop-blur-xl border-b border-white/5 px-4 sm:px-6 md:px-16 flex justify-between items-center shadow-2xl pt-[calc(env(safe-area-inset-top,0px)+1rem)] pb-4 md:pt-[calc(env(safe-area-inset-top,0px)+1.25rem)] md:pb-5 lg:pt-[calc(env(safe-area-inset-top,0px)+1.5rem)]"
     >
-      <a href="/#home" className="flex min-h-12 md:min-h-11 items-center gap-3 hover:opacity-80 transition-all font-sans shrink-0" onClick={closeMenu}>
+      <a href="/#home" className="relative z-110 flex min-h-12 md:min-h-11 items-center gap-3 hover:opacity-80 transition-all font-sans shrink-0 touch-manipulation" onClick={closeMenu}>
         <div className="w-10 h-10 rounded-full border border-cyan-500/30 overflow-hidden shadow-[0_0_15px_rgba(6,182,212,0.2)]">
           <img src={medicalLogo} alt="Portfolio logo" className="w-full h-full object-cover" width={40} height={40} decoding="async" fetchPriority="low" />
         </div>
@@ -67,7 +67,7 @@ const Header = () => {
         </span>
       </a>
 
-      <div className="flex items-center gap-2 sm:gap-4">
+      <div className="relative z-110 flex items-center gap-2 sm:gap-4 touch-manipulation">
         <nav className="hidden md:flex items-center gap-8" aria-label="Main">
           <ul className="flex items-center gap-6 text-[11px] font-black uppercase tracking-widest">
             {navItems.map(({ href, label }) => (
@@ -135,24 +135,21 @@ const Header = () => {
 
       {menuOpen ? (
         <div
-          className="fixed inset-0 z-90 md:hidden pointer-events-auto"
+          className="fixed inset-0 z-90 md:hidden pointer-events-none min-h-dvh"
           role="presentation"
           aria-hidden={!menuOpen}
         >
           <button
             type="button"
             style={{ top: `${headerHeightPx}px` }}
-            className="absolute left-0 right-0 bottom-0 bg-transparent"
+            className="absolute left-0 right-0 bottom-0 bg-[#03040b]/90 pointer-events-auto touch-manipulation"
             onClick={closeMenu}
             aria-label="Close menu overlay"
           />
           <div
             id="mobile-nav-panel"
-            style={{
-              top: `${headerHeightPx}px`,
-              height: `calc(100dvh - ${headerHeightPx}px)`,
-            }}
-            className="absolute right-0 flex w-[min(76vw,17rem)] max-w-full flex-col border-l border-cyan-400/35 bg-white/[0.07] backdrop-blur-2xl pt-10 pl-3 pr-[max(1rem,env(safe-area-inset-right))] pb-[max(1rem,env(safe-area-inset-bottom))] shadow-none"
+            style={{ top: `${headerHeightPx}px` }}
+            className="absolute right-0 bottom-0 flex w-[min(76vw,17rem)] max-w-full flex-col border-l border-cyan-400/35 bg-[#03040b] pt-10 pl-3 pr-[max(1rem,env(safe-area-inset-right))] pb-[max(1rem,env(safe-area-inset-bottom))] pointer-events-auto touch-manipulation"
             role="dialog"
             aria-modal="true"
             aria-label="Site navigation"

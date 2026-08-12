@@ -141,15 +141,14 @@ const Header = () => {
         >
           <button
             type="button"
-            style={{ top: `${headerHeightPx}px` }}
-            className="absolute left-0 right-0 bottom-0 bg-[#03040b]/50 backdrop-blur-md pointer-events-auto touch-manipulation"
+            className="absolute inset-0 bg-[#03040b]/40 backdrop-blur-sm pointer-events-auto touch-manipulation"
             onClick={closeMenu}
             aria-label="Close menu overlay"
           />
           <div
             id="mobile-nav-panel"
-            style={{ top: `${headerHeightPx}px` }}
-            className="absolute right-0 bottom-0 flex w-[min(76vw,17rem)] max-w-full flex-col border-l border-white/10 bg-[#0f172a]/85 backdrop-blur-lg pt-10 pl-3 pr-[max(1rem,env(safe-area-inset-right))] pb-[max(1rem,env(safe-area-inset-bottom))] pointer-events-auto touch-manipulation"
+            style={{ paddingTop: `${headerHeightPx + 24}px` }}
+            className="absolute top-0 right-0 bottom-0 flex w-[min(76vw,17rem)] max-w-full flex-col border-l border-white/10 bg-[#0f172a]/80 backdrop-blur-xl pl-3 pr-[max(1rem,env(safe-area-inset-right))] pb-[max(1rem,env(safe-area-inset-bottom))] pointer-events-auto touch-manipulation"
             role="dialog"
             aria-modal="true"
             aria-label="Site navigation"

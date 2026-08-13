@@ -54,6 +54,20 @@ const Header = () => {
   const menuButtonClass =
     'min-h-12 min-w-12 flex items-center justify-center rounded-xl text-white/80 hover:bg-white/10 hover:text-cyan-400 active:bg-white/15 transition-colors';
 
+  // Scroll lock čuva poziciju pri otvaranju menija; pre zatvaranja postavi cilj da unlock ne vrati na Contact.
+  const handleMobileNavClick = (href) => {
+    const id = href.includes('#') ? href.split('#').pop() : null;
+    const target = id ? document.getElementById(id) : null;
+
+    if (target && document.body.dataset.scrollLockY != null) {
+      const lockedY = Number(document.body.dataset.scrollLockY || '0');
+      const targetY = Math.max(0, Math.round(target.getBoundingClientRect().top + lockedY));
+      document.body.dataset.scrollLockY = String(targetY);
+    }
+
+    closeMenu();
+  };
+
   return (
     <>
     <header
@@ -173,7 +187,7 @@ const Header = () => {
                           key={href}
                           href={href}
                           className="w-full py-3.5 pl-2 text-lg font-black uppercase tracking-widest text-white border-b border-white/15 hover:text-cyan-300 transition-colors [text-shadow:0_1px_3px_rgba(0,0,0,0.85)]"
-                          onClick={closeMenu}
+                          onClick={() => handleMobileNavClick(href)}
                         >
                           {label}
                         </a>
